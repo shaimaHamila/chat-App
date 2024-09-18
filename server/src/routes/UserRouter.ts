@@ -1,4 +1,4 @@
-import { getUsers } from "./../controller/UserController";
+import { getUsers } from "../controller/UserController";
 import { Router } from "express";
 import { updateUser, userDetails } from "../controller/UserController";
 

@@ -1,8 +1,8 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
 import { MongoConnect } from "../config/Database";
-import AuthRouter from "../routes/AuthRouter";
-import UserRouter from "../routes/UserRouter";
+import AuthRouter from "./routes/AuthRouter";
+import UserRouter from "./routes/UserRouter";
 import cookieParser from "cookie-parser";
 
 const app = express();
