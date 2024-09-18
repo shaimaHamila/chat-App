@@ -20,7 +20,6 @@ export const registerUser = async (req: Request, res: Response) => {
         .status(400)
         .json({ message: "Email already exists", error: true });
     }
-
     // Encrypt password
     const encryptedPassword = await encrypt.encryptpass(password);
 
@@ -53,67 +52,59 @@ export const registerUser = async (req: Request, res: Response) => {
   }
 };
 
-export const verifyEmail = async (req: Request, res: Response) => {
+export const Login = async (req: Request, res: Response) => {
   try {
-    const { email } = req.body;
+    const { email, password } = req.body;
 
-    if (!email) {
-      return res.status(400).json({ message: "Missing email", error: true });
+    // Check if email and password are provided
+    if (!email || !password) {
+      return res.status(400).json({
+        message: "Missing email or password",
+        error: true,
+      });
     }
 
-    const checkEmail = await User.findOne({ email }).select("-password");
+    // Find the user by email
+    const user = await User.findOne({ email });
 
-    if (!checkEmail) {
-      return res.status(404).json({ message: "Email not found", error: true });
-    }
-
-    return res.status(200).json({
-      message: "Email found",
-      data: checkEmail,
-      success: true,
-    });
-  } catch (error: any) {
-    console.error("Error during email verification:", error);
-
-    return res.status(500).json({
-      message: error?.message || "Internal server error",
-      error: true,
-    });
-  }
-};
-
-export const verifyPassword = async (req: Request, res: Response) => {
-  try {
-    const { password, id } = req.body;
-
-    if (!password || !id) {
-      return res
-        .status(400)
-        .json({ message: "Missing password or id", error: true });
-    }
-
-    const user = await User.findById(id);
+    // If user doesn't exist
     if (!user) {
-      return res.status(404).json({ message: "User not found", error: true });
+      return res.status(404).json({
+        message: "Email not found",
+        error: true,
+      });
     }
 
-    const verifyPassword = encrypt.comparepassword(user.password, password);
+    // Compare the provided password with the stored hashed password
+    const isPasswordValid = encrypt.comparepassword(user.password, password);
 
-    if (!verifyPassword) {
-      return res.status(400).json({ message: "Invalid password", error: true });
+    // If password is incorrect
+    if (!isPasswordValid) {
+      return res.status(400).json({
+        message: "Invalid password",
+        error: true,
+      });
     }
+
     // Generate JWT token
     const tokenData = { id: user._id, email: user.email };
     const token = encrypt.generateToken(tokenData);
-    const cookisOptions = {
-      http: true,
-      secure: true,
+
+    // Set cookie options
+    const cookieOptions = {
+      httpOnly: true,
+      secure: true, // Ensure this is set to true in production
     };
-    return res.cookie("token", token, cookisOptions).status(200).json({
-      message: "Login successfully",
-      data: user,
-      success: true,
-    });
+
+    // Send the JWT token in a cookie and return success response
+    return res
+      .cookie("token", token, cookieOptions)
+      .status(200)
+      .json({
+        message: "Login successfully",
+        data: { id: user._id, email: user.email, name: user.name }, // Send only necessary data
+        success: true,
+      });
   } catch (error: any) {
     console.error("Error during email verification:", error);
 

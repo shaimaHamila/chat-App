@@ -1,0 +1,49 @@
+.text-6xl {
+    font-size: 60px;
+    line-height: 150%;
+}
+
+.text-5xl {
+    font-size: 48px;
+    line-height: 150%;
+}
+
+.text-4xl {
+    font-size: 36px;
+    line-height: 150%;
+}
+
+.text-3xl {
+    font-size: 30px;
+    line-height: 150%;
+}
+
+.text-2xl {
+    font-size: 24px;
+    line-height: 150%;
+}
+
+.text-xl {
+    font-size: 20px;
+    line-height: 150%;
+}
+
+.text-lg {
+    font-size: 18px;
+    line-height: 150%;
+}
+
+.text-md {
+    font-size: 16px;
+    line-height: 150%;
+}
+
+.text-sm {
+    font-size: 14px;
+    line-height: 150%;
+}
+
+.text-xs {
+    font-size: 12px;
+    line-height: 150%;
+}

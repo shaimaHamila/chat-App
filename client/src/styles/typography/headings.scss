@@ -1,0 +1,103 @@
+/* 
+Defines the typography of Converty.
+Will be used in the whole project.
+Font used is Inter.
+*/
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap");
+
+/* apply style to whole website */
+body {
+    font-family: "Inter";
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 150%;
+    color: var(--color-white);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-weight: 700;
+    line-height: 100%;
+    margin: 0;
+}
+
+p {
+    font-weight: 400;
+}
+
+.heading-4xl {
+    font-size: 72px;
+}
+
+.heading-3xl {
+    font-size: 60px;
+}
+
+.heading-2xl {
+    font-size: 48px;
+}
+
+.heading-xl {
+    font-size: 36px;
+    line-height: 120%;
+}
+
+.heading-lg {
+    font-size: 30px;
+    line-height: 120%;
+}
+
+.heading-md {
+    font-size: 20px;
+    line-height: 120%;
+}
+
+.heading-sm {
+    font-size: 16px;
+    line-height: 120%;
+}
+
+.heading-xs {
+    font-size: 14px;
+    line-height: 120%;
+}
+
+@media screen and (max-width: 768px) {
+    .heading-4xl {
+        font-size: 60px;
+    }
+
+    .heading-3xl {
+        font-size: 48px;
+    }
+
+    .heading-2xl {
+        font-size: 36px;
+    }
+
+    .heading-xl {
+        font-size: 30px;
+    }
+
+    .heading-lg {
+        font-size: 24px;
+    }
+
+    .heading-md {
+        font-size: 20px;
+    }
+
+    .heading-sm {
+        font-size: 16px;
+    }
+
+    .heading-xs {
+        font-size: 14px;
+    }
+}

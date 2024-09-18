@@ -1,11 +1,42 @@
-import "./App.css";
-import Title from "antd/es/typography/Title";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
+import { useEffect, useState } from "react";
+import PrivateRoutes from "./routes/PrivateRoutes";
+import PublicRoutes from "./routes/PublicRouts";
+import { useAppDispatch, useAppSelector } from "./store/hooks";
+import { fetchCurrentUser, selectCurrentUser } from "./features/auth/authSlice";
+import { Loading } from "./components/atoms/Loading/Loading";
 
 function App() {
+  const currentUser = useAppSelector(selectCurrentUser);
+  const dispatch = useAppDispatch();
+  const [isLoading, setIsLoading] = useState(true); // Add a loading state
+
+  useEffect(() => {
+    const checkUserSession = async () => {
+      const token = localStorage.getItem("user");
+      if (token) {
+        await dispatch(fetchCurrentUser());
+      }
+      setIsLoading(false);
+    };
+
+    checkUserSession();
+  }, [dispatch]);
+
+  if (isLoading) {
+    return <Loading />;
+  }
+
   return (
-    <div style={{ width: "80%" }}>
-      <Title level={3}>Room messages</Title>
-    </div>
+    <>
+      <Toaster />
+      <Router>
+        <Routes>
+          <Route path='*' element={currentUser ? <PrivateRoutes /> : <PublicRoutes />} />
+        </Routes>
+      </Router>
+    </>
   );
 }
 

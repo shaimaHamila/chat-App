@@ -1,0 +1,21 @@
+.register-content-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 90vh;
+  width: 100%;
+  padding: 2rem;
+  background-color: var(--white);
+}
+.register-content-form {
+  background-color: #f5f5f5;
+  padding: 2rem;
+  border-radius: 0.5rem;
+  width: 400px;
+  min-width: 300px;
+}
+.register-logo {
+  color: var(--white);
+  font-size: 1.25rem;
+  font-weight: 700;
+}
