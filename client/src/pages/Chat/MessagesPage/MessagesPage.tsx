@@ -84,7 +84,7 @@ const MessagesPage: React.FC = ({}) => {
           <Empty description='Start The conversation' />
         )}
       </div>
-      <ChatInput inputValue={inputValue} setInputValue={setInputValue} onSendMessage={onSendMessage} />
+      <ChatInput onSendMessage={onSendMessage} />
     </div>
   );
 };

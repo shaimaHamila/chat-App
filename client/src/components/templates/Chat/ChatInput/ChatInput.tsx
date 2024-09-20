@@ -1,70 +1,189 @@
 import React, { useState } from "react";
-import { Button, Upload, Image, UploadFile, UploadProps, Form } from "antd";
+import { Button, Upload, Image, UploadFile, UploadProps, Form, FormProps } from "antd";
 import TextArea from "antd/es/input/TextArea";
-import { UploadOutlined, CloseOutlined } from "@ant-design/icons";
+import { UploadOutlined, CloseOutlined, SendOutlined } from "@ant-design/icons";
 import "./ChatInput.scss";
+import { uploadFile } from "../../../../helper/UploadFile";
 
+type Message = {
+  text: string;
+  imagesUrl: string[];
+  videosUrl: string[];
+};
 interface ChatInputProps {
-  inputValue: string;
-  setInputValue: (value: string) => void;
-  onSendMessage: () => void;
+  onSendMessage: (message: Message) => void;
 }
 
-const ChatInput: React.FC<ChatInputProps> = ({ inputValue, setInputValue, onSendMessage }) => {
-  const [profilePic, setProfilePic] = useState<UploadFile[]>([]);
+const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage }) => {
+  const [fileList, setFileList] = useState<UploadFile[]>([]);
+  const [imageFiles, setImageFiles] = useState<UploadFile[]>([]);
+  const [videoFiles, setVideoFiles] = useState<UploadFile[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [videoPreviews, setVideoPreviews] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const [chatForm] = Form.useForm();
+
+  const onFinish: FormProps<Message>["onFinish"] = async () => {
+    console.log("chatForm", chatForm.getFieldsValue());
+    console.log("imageFiles", imageFiles);
+    console.log("videoFiles", videoFiles);
+
+    const imagesUrl: string[] = [];
+    const videosUrl: string[] = [];
+
+    setLoading(true);
+
+    // Upload images
+    for (const file of imageFiles) {
+      const uploadPhoto = await uploadFile(file);
+      if (uploadPhoto?.url) {
+        imagesUrl.push(uploadPhoto.url);
+      }
+    }
+
+    // Upload videos
+    for (const file of videoFiles) {
+      const uploadVideo = await uploadFile(file);
+      if (uploadVideo?.url) {
+        videosUrl.push(uploadVideo.url);
+      }
+    }
+
+    // Set URLs to the form fields
+    chatForm.setFieldValue("imagesUrl", imagesUrl);
+    chatForm.setFieldValue("videosUrl", videosUrl);
+
+    // Send the message
+    onSendMessage(chatForm.getFieldsValue());
+
+    // Reset form fields and state
+    chatForm.resetFields();
+    setFileList([]);
+    setImageFiles([]);
+    setVideoFiles([]);
+    setImagePreviews([]);
+    setVideoPreviews([]);
+
+    setLoading(false);
+  };
 
   const handleChange: UploadProps["onChange"] = async ({ fileList }) => {
-    setProfilePic(fileList);
+    const imageFiles = fileList.filter((file) => file.originFileObj && file.originFileObj.type.startsWith("image"));
+    const videoFiles = fileList.filter((file) => file.originFileObj && file.originFileObj.type.startsWith("video"));
 
-    const previewPromises = fileList.map((file) => {
+    setFileList(fileList); // Update the main fileList state
+    setImageFiles(imageFiles);
+    setVideoFiles(videoFiles);
+
+    const imagePromises = imageFiles.map((file) => {
       return new Promise<string>((resolve) => {
         const reader = new FileReader();
-        reader.readAsDataURL(file.originFileObj as Blob);
-        reader.onload = () => resolve(reader.result as string);
+        if (file.originFileObj) {
+          reader.readAsDataURL(file.originFileObj as Blob);
+          reader.onload = () => resolve(reader.result as string);
+        }
       });
     });
 
-    const previews = await Promise.all(previewPromises);
-    setImagePreviews(previews);
+    const videoPromises = videoFiles.map((file) => {
+      return new Promise<string>((resolve) => {
+        const reader = new FileReader();
+        if (file.originFileObj) {
+          reader.readAsDataURL(file.originFileObj as Blob);
+          reader.onload = () => resolve(reader.result as string);
+        }
+      });
+    });
+
+    const images = await Promise.all(imagePromises);
+    const videos = await Promise.all(videoPromises);
+    setImagePreviews(images);
+    setVideoPreviews(videos);
   };
 
-  const handleDelete = (index: number) => {
-    setProfilePic((prev) => prev.filter((_, i) => i !== index));
+  const handleDeleteImage = (index: number) => {
+    const newImageFiles = imageFiles.filter((_, i) => i !== index);
+    const newFileList = fileList.filter(
+      (file) => !file.originFileObj?.type.startsWith("image") || file !== imageFiles[index],
+    );
+
+    setImageFiles(newImageFiles);
+    setFileList(newFileList); // Update the fileList in Upload component
     setImagePreviews((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleDeleteVideo = (index: number) => {
+    const newVideoFiles = videoFiles.filter((_, i) => i !== index);
+    const newFileList = fileList.filter(
+      (file) => !file.originFileObj?.type.startsWith("video") || file !== videoFiles[index],
+    );
+
+    setVideoFiles(newVideoFiles);
+    setFileList(newFileList); // Update the fileList in Upload component
+    setVideoPreviews((prev) => prev.filter((_, i) => i !== index));
   };
 
   return (
     <div className='message-section__input'>
-      <div className='uploaded-images'>
-        {imagePreviews.map((preview, index) => (
-          <div key={index} className='uploaded-image' style={{ position: "relative", marginRight: 8 }}>
-            <Image style={{ borderRadius: "6px" }} src={preview} width={70} height={70} />
-            <Button
-              size='small'
-              danger
-              shape='circle'
-              icon={<CloseOutlined />}
-              onClick={() => handleDelete(index)}
-              style={{ position: "absolute", top: 4, right: 4, transform: "translate(50%, -50%)" }}
-            />
-          </div>
-        ))}
-      </div>
-      <Form>
+      {(imageFiles.length || videoFiles.length) > 0 && (
+        <div className='uploaded-media'>
+          {/* Uploaded Images */}
+          {imagePreviews.map((preview, index) => (
+            <div key={index} className='uploaded-image' style={{ position: "relative", marginRight: 8 }}>
+              <Image style={{ borderRadius: "6px" }} src={preview} width={70} height={70} />
+              <Button
+                size='small'
+                danger
+                shape='circle'
+                icon={<CloseOutlined />}
+                onClick={() => handleDeleteImage(index)}
+                style={{ position: "absolute", top: 4, right: 4, transform: "translate(50%, -50%)" }}
+              />
+            </div>
+          ))}
+
+          {/* Uploaded Videos */}
+          {videoPreviews.map((preview, index) => (
+            <div key={index} className='uploaded-video' style={{ position: "relative", marginRight: 8 }}>
+              <video width={70} height={70} controls>
+                <source src={preview} />
+                Your browser does not support the video tag.
+              </video>
+              <Button
+                size='small'
+                danger
+                shape='circle'
+                icon={<CloseOutlined />}
+                onClick={() => handleDeleteVideo(index)}
+                style={{ position: "absolute", top: 4, right: 4, transform: "translate(50%, -50%)" }}
+              />
+            </div>
+          ))}
+        </div>
+      )}
+
+      <Form layout='vertical' name='chat-form' form={chatForm} onFinish={onFinish} autoComplete='off'>
         <div className='chat-form'>
-          <Upload showUploadList={false} multiple onChange={handleChange} beforeUpload={() => false}>
+          <Upload
+            name='media'
+            showUploadList={false}
+            multiple
+            onChange={handleChange}
+            beforeUpload={() => false}
+            fileList={fileList}
+            accept='image/*,video/*'
+          >
             <Button icon={<UploadOutlined />} />
           </Upload>
 
-          <TextArea
-            autoSize={{ minRows: 1, maxRows: 6 }}
-            allowClear
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            placeholder='Type your message...'
-          />
-          <Button onClick={onSendMessage}>Send</Button>
+          <Form.Item name='text' style={{ margin: 0, width: "100%" }}>
+            <TextArea autoSize={{ minRows: 1, maxRows: 6 }} allowClear placeholder='Type your message...' />
+          </Form.Item>
+
+          <Button loading={loading} type='primary' htmlType='submit' icon={<SendOutlined />}>
+            Submit
+          </Button>
         </div>
       </Form>
     </div>
