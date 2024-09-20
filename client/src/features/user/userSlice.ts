@@ -11,6 +11,7 @@ interface initialStatePrps {
   error: string | null;
   searchedUserName: string;
   totalCount: number | null;
+  onlineUsers: String[]; //TODO
 }
 
 const initialState: initialStatePrps = {
@@ -19,6 +20,7 @@ const initialState: initialStatePrps = {
   error: "",
   searchedUserName: "",
   totalCount: null,
+  onlineUsers: [],
 };
 export const fetchUsers = createAsyncThunk<{ users: User[]; totalCount: number }, void>(
   "user/fetchUsers",
@@ -39,7 +41,7 @@ export const fetchUsers = createAsyncThunk<{ users: User[]; totalCount: number }
 );
 
 export const fetchUserData = createAsyncThunk<User, void>("user/fetchUserData", async () => {
-  const url = `${import.meta.env.VITE_BASE_URL}/api/user/details`;
+  const url = `${import.meta.env.VITE_BASE_URL}/api/user/current-user-details`;
 
   try {
     const response = await axios({
@@ -74,6 +76,9 @@ const userSlice = createSlice({
   reducers: {
     setSearchUser(state, action: PayloadAction<string>) {
       state.searchedUserName = action.payload;
+    },
+    setOnlineUsers(state, action) {
+      state.onlineUsers = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -119,9 +124,12 @@ export const setSearchUser =
     dispatch(fetchUsers());
   };
 
+export const { setOnlineUsers } = userSlice.actions;
+
 export const selectStatus = (state: RootState) => state.user.status;
 
 export const selectUsers = (state: RootState) => state.user.users;
+export const selectOnlineUsers = (state: RootState) => state.user.onlineUsers;
 
 export const selectTotalCount = (state: RootState) => state.user.totalCount;
 

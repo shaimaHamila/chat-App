@@ -1,0 +1,15 @@
+.chat-window {
+  display: flex;
+  height: 100%;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: auto;
+}
+.center-the-content {
+  flex-direction: column;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+}

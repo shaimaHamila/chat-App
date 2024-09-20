@@ -5,11 +5,11 @@ import { Layout } from "antd";
 import { Content } from "antd/es/layout/layout";
 import AddUserToChatModal from "../../components/organisms/AddUserToChat/AddUserToChatModal";
 import UpdateProfilModal from "../../components/organisms/UpdateProfilModal/UpdateProfilModal";
-import { fetchCurrentUser, logout, selectCurrentUser, updateCurrentUser } from "../../features/auth/authSlice";
+import { logout, selectCurrentUser, updateCurrentUser } from "../../features/auth/authSlice";
 import { store } from "../../store/store";
 import SideBar from "../../components/templates/SideBar/SideBar";
 import { useAppSelector } from "../../store/hooks";
-import { fetchUsers, selectUsers, setSearchUser } from "../../features/user/userSlice";
+import { fetchUsers, selectOnlineUsers, selectUsers, setSearchUser } from "../../features/user/userSlice";
 
 const userMenuItems = [
   { key: "/chat", label: "Chat", icon: <MessageOutlined /> },
@@ -23,16 +23,14 @@ const DashboardLayout = () => {
 
   const currentUser = useAppSelector(selectCurrentUser);
   const _users = useAppSelector(selectUsers);
+  const _onlineUsers = useAppSelector(selectOnlineUsers);
   // Trigger navigation to login if user is logged out
   useEffect(() => {
     if (!currentUser) {
       navigate("/login");
     }
-  }, [currentUser, navigate]); // Watch for changes to currentUser
+  }, [currentUser, navigate]);
 
-  useEffect(() => {
-    store.dispatch(fetchCurrentUser());
-  }, []);
   return (
     <Layout style={{ marginLeft: "80px", height: "100vh" }}>
       <SideBar
@@ -53,7 +51,7 @@ const DashboardLayout = () => {
       <Content style={{ margin: "12px" }}>
         <div
           style={{
-            padding: 22,
+            // padding: 22,
             background: "white",
             borderRadius: "4px",
             height: "100%",
@@ -68,12 +66,16 @@ const DashboardLayout = () => {
         isAddUserToChatModalOpen={isAddUserToChatModalOpen}
         onAddUserToChat={(userId: number | null) => {
           console.log("Function not implemented, onAddUserToChat", userId);
+          if (userId !== null) {
+            navigate(`/chat/${userId}`); // Navigate to /:userId
+          }
           setIsAddUserToChatModalOpen(false);
         }}
         handleClose={() => setIsAddUserToChatModalOpen(false)}
         isloading={false}
         users={_users}
         onSearchUserChange={(userName) => store.dispatch(setSearchUser(userName))}
+        onlineUsers={_onlineUsers}
       />
       <UpdateProfilModal
         isUpdateProfileModalOpen={isUpdateProfileModalOpen}

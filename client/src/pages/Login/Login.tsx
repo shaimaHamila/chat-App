@@ -37,7 +37,7 @@ const Login = () => {
       </Header>
       <Content className='register-content-container'>
         <Form
-          className='register-content-form'
+          className='login-content-form'
           layout='vertical'
           name='login'
           form={form}

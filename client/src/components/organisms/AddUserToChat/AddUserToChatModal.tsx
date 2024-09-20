@@ -1,4 +1,4 @@
-import { Avatar, Button, Checkbox, List, Modal } from "antd";
+import { Avatar, Badge, Button, Checkbox, List, Modal } from "antd";
 import { SearchProps } from "antd/es/input";
 import Search from "antd/es/input/Search";
 import { useState } from "react";
@@ -11,6 +11,7 @@ export interface AddUserToChatModalProps {
   handleClose: () => void;
   isloading: boolean;
   users: User[];
+  onlineUsers: String[];
   onSearchUserChange: (searchedDeliveruId: string) => void;
 }
 
@@ -20,6 +21,7 @@ const AddUserToChatModal: React.FC<AddUserToChatModalProps> = ({
   handleClose,
   isloading,
   users,
+  onlineUsers,
   onSearchUserChange,
 }: AddUserToChatModalProps) => {
   const [selectedUser, setSelectedUser] = useState<number | null>(null);
@@ -62,7 +64,11 @@ const AddUserToChatModal: React.FC<AddUserToChatModalProps> = ({
             >
               <List.Item.Meta
                 style={{ padding: "0 10px" }}
-                avatar={<Avatar src={item?.profile_pic} icon={<UserOutlined />} />}
+                avatar={
+                  <Badge color='green' dot={onlineUsers.includes(item?._id)}>
+                    <Avatar src={item?.profile_pic} icon={<UserOutlined />} />
+                  </Badge>
+                }
                 title={item.name}
                 description={"Email: " + item?.email}
               />
