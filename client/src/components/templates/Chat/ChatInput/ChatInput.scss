@@ -1,0 +1,31 @@
+.message-section__input {
+  padding: 10px;
+  border-top: 1px solid var(--gray-200);
+  background-color: var(--white);
+
+  .chat-form {
+    display: flex;
+    padding: 10px;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: flex-end;
+    gap: 0.5rem;
+    width: 100%;
+  }
+  .ant-input {
+    margin-right: 10px;
+    flex: 1;
+  }
+  .uploaded-images {
+    display: grid;
+    grid-auto-flow: column;
+    gap: 0.5rem;
+    overflow-x: auto;
+    grid-auto-columns: min-content;
+    padding: 0.5rem;
+    margin: 8px 14px;
+  }
+  .uploaded-image {
+    flex-shrink: 0;
+  }
+}

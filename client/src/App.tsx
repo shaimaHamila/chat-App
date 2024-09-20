@@ -6,6 +6,7 @@ import PublicRoutes from "./routes/PublicRouts";
 import { useAppDispatch, useAppSelector } from "./store/hooks";
 import { fetchCurrentUser, selectCurrentUser } from "./features/auth/authSlice";
 import { Loading } from "./components/atoms/Loading/Loading";
+import { SocketProvider } from "./socket/socket";
 
 function App() {
   const currentUser = useAppSelector(selectCurrentUser);
@@ -33,7 +34,18 @@ function App() {
       <Toaster />
       <Router>
         <Routes>
-          <Route path='*' element={currentUser ? <PrivateRoutes /> : <PublicRoutes />} />
+          <Route
+            path='*'
+            element={
+              currentUser ? (
+                <SocketProvider>
+                  <PrivateRoutes />
+                </SocketProvider>
+              ) : (
+                <PublicRoutes />
+              )
+            }
+          />
         </Routes>
       </Router>
     </>

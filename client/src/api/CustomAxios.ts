@@ -12,11 +12,15 @@ api.interceptors.response.use(
   async (error) => {
     if (error.response.status === 401) {
       localStorage.removeItem("user");
+      localStorage.removeItem("token");
+
       window.location.href = "/login";
       await api.get("/auth/logout");
     }
     if (error.response.status === 500) {
       localStorage.removeItem("user");
+      localStorage.removeItem("token");
+
       window.location.href = "/login";
       await api.get("/auth/logout");
     }

@@ -1,0 +1,20 @@
+.message-section {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  background-image: url("/img/wallapaper.jpeg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  overflow-x: hidden;
+  min-width: 400px;
+
+  &__messages {
+    flex: 1;
+    padding: 10px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    min-width: 400px;
+  }
+}

@@ -40,7 +40,7 @@ const SideBar: React.FC<SideBarProps> = ({
           <div className='side-menu--header'>
             <img
               className={`side-menu--header-logo`}
-              src='/public/logo/astrolab.png'
+              src='/logo/astrolab.png'
               alt='vanlog logo'
               style={{ maxWidth: "3rem" }}
             />

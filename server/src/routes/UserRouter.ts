@@ -1,10 +1,13 @@
-import { getUsers } from "../controller/UserController";
+import {
+  getCurrentUserDetails,
+  getUsers,
+  updateUser,
+} from "../controller/UserController";
 import { Router } from "express";
-import { updateUser, userDetails } from "../controller/UserController";
 
 const UserRouter = Router();
 
-UserRouter.get("/details", userDetails);
+UserRouter.get("/current-user-details", getCurrentUserDetails);
 UserRouter.post("/update", updateUser);
 UserRouter.get("/all-users", getUsers);
 

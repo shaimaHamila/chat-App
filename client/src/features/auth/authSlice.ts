@@ -39,6 +39,7 @@ export const login = createAsyncThunk<User, User>("auth/login", async ({ email, 
     });
     toast.success(response?.data?.message);
     localStorage.setItem("user", response?.data?.data?.name);
+    localStorage.setItem("token", response?.data?.token);
     console.log("response.data: ", response?.data);
     return response.data.data;
   } catch (error: any) {
@@ -57,6 +58,8 @@ export const logout = createAsyncThunk<void, void>("auth/logout", async () => {
     });
     toast.success(response?.data?.message);
     localStorage.removeItem("user");
+    localStorage.removeItem("token");
+
     return response.data;
   } catch (error: any) {
     toast.error(error?.response?.data?.message);
@@ -65,7 +68,7 @@ export const logout = createAsyncThunk<void, void>("auth/logout", async () => {
 });
 
 export const fetchCurrentUser = createAsyncThunk<User, void>("auth/fetchCurrentUser", async () => {
-  const url = `${import.meta.env.VITE_BASE_URL}/user/details`;
+  const url = `${import.meta.env.VITE_BASE_URL}/user/current-user-details`;
 
   try {
     const response = await axios({
@@ -164,6 +167,8 @@ const authSlice = createSlice({
   },
 });
 export const selectCurrentUser = (state: RootState) => state.auth.currentUser;
+
+export const selectCurrentUserId = (state: RootState) => state.auth.currentUser?._id;
 
 export const selectStatus = (state: RootState) => state.auth.status;
 

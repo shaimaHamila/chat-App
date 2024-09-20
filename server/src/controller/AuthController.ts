@@ -103,6 +103,7 @@ export const Login = async (req: Request, res: Response) => {
       .json({
         message: "Login successfully",
         data: { id: user._id, email: user.email, name: user.name }, // Send only necessary data
+        token,
         success: true,
       });
   } catch (error: any) {

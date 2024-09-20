@@ -1,0 +1,46 @@
+.chatUser-card {
+  background: white;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  min-width: 200px;
+  border: 1px solid var(--gray-200);
+
+  &--selected {
+    background-color: var(--gray-100);
+    border: 1px var(--primary-500) solid;
+  }
+
+  &--container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+  &--data {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 0.5rem;
+    &-text {
+      display: flex;
+      flex-direction: column;
+      flex-wrap: nowrap;
+      align-items: flex-start;
+      gap: 6px;
+    }
+    &-lastMsg {
+      font-weight: 600;
+      color: var(--gray-500);
+    }
+    &-username {
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--gray-700);
+    }
+  }
+
+  .ant-card-body {
+    padding: 12px;
+  }
+}

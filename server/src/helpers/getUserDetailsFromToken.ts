@@ -1,4 +1,3 @@
-import { JwtPayload } from "jsonwebtoken"; // Assuming you're using `jsonwebtoken`
 import User from "../models/User";
 import { encrypt } from "./helpers";
 
