@@ -28,4 +28,10 @@
   .uploaded-image {
     flex-shrink: 0;
   }
+  .emoji-picker {
+    position: absolute;
+    bottom: 5rem;
+    right: 10rem;
+    z-index: 10;
+  }
 }
