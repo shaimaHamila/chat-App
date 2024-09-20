@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Button, Upload, Image, UploadFile, UploadProps, Form, FormProps } from "antd";
 import TextArea from "antd/es/input/TextArea";
-import { UploadOutlined, CloseOutlined, SendOutlined } from "@ant-design/icons";
+import { UploadOutlined, CloseOutlined, SendOutlined, SmileOutlined } from "@ant-design/icons";
 import "./ChatInput.scss";
 import { uploadFile } from "../../../../helper/UploadFile";
+import Picker from "@emoji-mart/react";
+import data from "@emoji-mart/data";
 
 type Message = {
   text: string;
@@ -21,8 +23,10 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage }) => {
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [videoPreviews, setVideoPreviews] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
-
+  const [emojiPickerVisible, setEmojiPickerVisible] = useState(false);
+  const [inputValue, setInputValue] = useState("");
   const [chatForm] = Form.useForm();
+  const emojiPickerRef = useRef<HTMLDivElement>(null);
 
   const onFinish: FormProps<Message>["onFinish"] = async () => {
     console.log("chatForm", chatForm.getFieldsValue());
@@ -53,6 +57,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage }) => {
     // Set URLs to the form fields
     chatForm.setFieldValue("imagesUrl", imagesUrl);
     chatForm.setFieldValue("videosUrl", videosUrl);
+    console.log("Message chatForm", chatForm.getFieldsValue());
 
     // Send the message
     onSendMessage(chatForm.getFieldsValue());
@@ -64,6 +69,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage }) => {
     setVideoFiles([]);
     setImagePreviews([]);
     setVideoPreviews([]);
+    setInputValue("");
 
     setLoading(false);
   };
@@ -123,6 +129,29 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage }) => {
     setFileList(newFileList); // Update the fileList in Upload component
     setVideoPreviews((prev) => prev.filter((_, i) => i !== index));
   };
+  //Emoji
+  const handleEmojiSelect = (emoji: any) => {
+    const newValue = inputValue + emoji.native;
+    setInputValue(newValue);
+    chatForm.setFieldValue("text", newValue);
+  };
+
+  const handleOutsideClick = (event: MouseEvent) => {
+    if (emojiPickerRef.current && !emojiPickerRef.current.contains(event.target as Node)) {
+      setEmojiPickerVisible(false); // Close the emoji picker if clicked outside
+    }
+  };
+
+  useEffect(() => {
+    if (emojiPickerVisible) {
+      document.addEventListener("click", handleOutsideClick);
+    } else {
+      document.removeEventListener("click", handleOutsideClick);
+    }
+    return () => {
+      document.removeEventListener("click", handleOutsideClick); // Clean up when component unmounts
+    };
+  }, [emojiPickerVisible]);
 
   return (
     <div className='message-section__input'>
@@ -180,6 +209,21 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage }) => {
           <Form.Item name='text' style={{ margin: 0, width: "100%" }}>
             <TextArea autoSize={{ minRows: 1, maxRows: 6 }} allowClear placeholder='Type your message...' />
           </Form.Item>
+          <div>
+            <Button
+              icon={<SmileOutlined />}
+              onClick={(e) => {
+                e.stopPropagation(); // Prevent click event from bubbling up
+                setEmojiPickerVisible(!emojiPickerVisible);
+              }}
+              style={{ color: "#ffac00" }}
+            />
+            {emojiPickerVisible && (
+              <div className='emoji-picker' ref={emojiPickerRef}>
+                <Picker theme={"light"} data={data} onEmojiSelect={handleEmojiSelect} />
+              </div>
+            )}
+          </div>
 
           <Button loading={loading} type='primary' htmlType='submit' icon={<SendOutlined />}>
             Submit
