@@ -16,14 +16,14 @@
     margin-right: 10px;
     flex: 1;
   }
-  .uploaded-images {
+  .uploaded-media {
     display: grid;
     grid-auto-flow: column;
     gap: 0.5rem;
     overflow-x: auto;
     grid-auto-columns: min-content;
     padding: 0.5rem;
-    margin: 8px 14px;
+    margin: 0px 14px;
   }
   .uploaded-image {
     flex-shrink: 0;
