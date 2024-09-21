@@ -1,6 +1,5 @@
 import "./MessagesPage.scss";
 import { useContext, useEffect, useRef, useState } from "react";
-import Message from "../../../components/templates/Chat/Message/Message";
 import ChatInput from "../../../components/templates/Chat/ChatInput/ChatInput";
 import MessageSectionHeader from "../../../components/templates/Chat/MessageSectionHeader/MessageSectionHeader";
 import { Empty } from "antd";
@@ -9,17 +8,31 @@ import { store } from "../../../store/store";
 import { useAppSelector } from "../../../store/hooks";
 import { useParams } from "react-router-dom";
 import { SocketContext } from "../../../socket/socket";
+import { Message as MessageType } from "../../../types/Message";
+import { User } from "../../../types/User";
+import MessageContent from "../../../components/templates/Chat/Message/MessageContent";
+import { MessageContent as MessageContentType } from "../../../types/Message";
 
 // Fake messages data
-const initialMessages: any = [
-  { id: "1", messageContent: "Hey there!", senderId: "66e8b30bbd7607be8a84ea26" },
-  { id: "2", messageContent: "How are you?", senderId: "2" },
-  { id: "3", messageContent: "I'm good, how about you?", senderId: "1" },
+const initialMessages: MessageType[] = [
+  { _id: "1", messageContent: { text: "Hey there!", imagesUrl: [], videosUrl: [] }, from: "66e8b30bbd7607be8a84ea26" },
+  {
+    _id: "2",
+    messageContent: { text: "How are you?", imagesUrl: [], videosUrl: ["https://www.w3schools.com/html/mov_bbb.mp4"] },
+    from: "2",
+  },
+  {
+    _id: "3",
+    messageContent: {
+      text: "I'm good, how about you?",
+      imagesUrl: ["https://picsum.photos/200", "https://picsum.photos/200"],
+      videosUrl: ["https://www.w3schools.com/html/mov_bbb.mp4"],
+    },
+    from: "1",
+  },
 ];
-
 const MessagesPage: React.FC = ({}) => {
-  const [inputValue, setInputValue] = useState<string>("");
-  const [userData, setUserData] = useState({
+  const [userData, setUserData] = useState<User>({
     _id: "",
     name: "",
     email: "",
@@ -27,10 +40,10 @@ const MessagesPage: React.FC = ({}) => {
     online: false,
   });
   const messageContainerRef = useRef<HTMLDivElement>(null);
-  const [messages, setMessages] = useState(initialMessages);
+  const [messages, setMessages] = useState<MessageType[]>(initialMessages);
   const socket = useContext(SocketContext);
   const currentUser = useAppSelector(selectCurrentUser);
-  const params = useParams();
+  const params = useParams<{ id: string }>();
 
   useEffect(() => {
     store.dispatch(fetchCurrentUser());
@@ -54,15 +67,15 @@ const MessagesPage: React.FC = ({}) => {
     }
   }, [socket, params?.id]);
 
-  const onSendMessage = () => {
-    if (inputValue.trim()) {
+  const onSendMessage = (messageContent: MessageContentType) => {
+    const { text = "", imagesUrl = [], videosUrl = [] } = messageContent || {};
+    if (text || (imagesUrl && imagesUrl.length > 0) || (videosUrl && videosUrl.length > 0)) {
       const newMessage = {
-        id: Date.now().toString(), // Temporary ID using timestamp
-        messageContent: inputValue,
-        senderId: currentUser?._id || "1",
+        _id: Date.now().toString(),
+        messageContent: messageContent,
+        from: currentUser?._id || "1",
       };
-      setMessages((prevMessages: any) => [...prevMessages, newMessage]);
-      setInputValue("");
+      setMessages((prevMessages) => [...prevMessages, newMessage]);
     }
   };
 
@@ -77,14 +90,18 @@ const MessagesPage: React.FC = ({}) => {
       <MessageSectionHeader userName={userData.name} userImage={userData.profile_pic} isOnline={userData.online} />
       <div className='message-section__messages' ref={messageContainerRef}>
         {messages.length !== 0 ? (
-          messages.map((message: any) => (
-            <Message key={message.id} text={message.messageContent} isUser={currentUser?._id === message.senderId} />
+          messages.map((message, key) => (
+            <MessageContent
+              key={key}
+              messageContent={message.messageContent}
+              isUser={currentUser?._id === message.from}
+            />
           ))
         ) : (
           <Empty description='Start The conversation' />
         )}
       </div>
-      <ChatInput onSendMessage={onSendMessage} />
+      <ChatInput onSendMessage={(message) => onSendMessage(message)} />
     </div>
   );
 };

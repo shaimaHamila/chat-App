@@ -4,6 +4,7 @@ export type User = {
   email?: string;
   password?: string;
   profile_pic?: string;
+  online?: boolean;
   createdAt?: string;
   updatedAt?: string;
   isDeleted?: boolean;
