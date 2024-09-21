@@ -6,14 +6,10 @@ import "./ChatInput.scss";
 import { uploadFile } from "../../../../helper/UploadFile";
 import Picker from "@emoji-mart/react";
 import data from "@emoji-mart/data";
+import { MessageContent } from "../../../../types/Message";
 
-type Message = {
-  text: string;
-  imagesUrl: string[];
-  videosUrl: string[];
-};
 interface ChatInputProps {
-  onSendMessage: (message: Message) => void;
+  onSendMessage: (message: MessageContent) => void;
 }
 
 const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage }) => {
@@ -28,11 +24,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage }) => {
   const [chatForm] = Form.useForm();
   const emojiPickerRef = useRef<HTMLDivElement>(null);
 
-  const onFinish: FormProps<Message>["onFinish"] = async () => {
-    console.log("chatForm", chatForm.getFieldsValue());
-    console.log("imageFiles", imageFiles);
-    console.log("videoFiles", videoFiles);
-
+  const onFinish: FormProps<MessageContent>["onFinish"] = async () => {
     const imagesUrl: string[] = [];
     const videosUrl: string[] = [];
 
@@ -57,7 +49,6 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage }) => {
     // Set URLs to the form fields
     chatForm.setFieldValue("imagesUrl", imagesUrl);
     chatForm.setFieldValue("videosUrl", videosUrl);
-    console.log("Message chatForm", chatForm.getFieldsValue());
 
     // Send the message
     onSendMessage(chatForm.getFieldsValue());
@@ -131,7 +122,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage }) => {
   };
   //Emoji
   const handleEmojiSelect = (emoji: any) => {
-    const newValue = inputValue + emoji.native;
+    const newValue = chatForm.getFieldValue("text") + emoji.native;
     setInputValue(newValue);
     chatForm.setFieldValue("text", newValue);
   };
@@ -175,7 +166,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage }) => {
           {/* Uploaded Videos */}
           {videoPreviews.map((preview, index) => (
             <div key={index} className='uploaded-video' style={{ position: "relative", marginRight: 8 }}>
-              <video width={70} height={70} controls>
+              <video style={{ borderRadius: "6px" }} width={70} height={70} controls muted autoPlay>
                 <source src={preview} />
                 Your browser does not support the video tag.
               </video>
