@@ -8,26 +8,28 @@ import { store } from "../../../store/store";
 import { useAppSelector } from "../../../store/hooks";
 import { useParams } from "react-router-dom";
 import { SocketContext } from "../../../socket/socket";
-import { Message as MessageType } from "../../../types/Message";
+import { Message, Message as MessageType } from "../../../types/Message";
 import { User } from "../../../types/User";
 import MessageContent from "../../../components/templates/Chat/Message/MessageContent";
 import { MessageContent as MessageContentType } from "../../../types/Message";
 
 // Fake messages data
 const initialMessages: MessageType[] = [
-  { _id: "1", messageContent: { text: "Hey there!", imagesUrl: [], videosUrl: [] }, from: "66e8b30bbd7607be8a84ea26" },
+  { _id: "1", text: "Hey there!", imagesUrl: [], videosUrl: [], from: "66e8b30bbd7607be8a84ea26" },
   {
     _id: "2",
-    messageContent: { text: "How are you?", imagesUrl: [], videosUrl: ["https://www.w3schools.com/html/mov_bbb.mp4"] },
+    text: "How are you?",
+    imagesUrl: [],
+    videosUrl: ["https://www.w3schools.com/html/mov_bbb.mp4"],
     from: "2",
   },
   {
     _id: "3",
-    messageContent: {
-      text: "I'm good, how about you?",
-      imagesUrl: ["https://picsum.photos/200", "https://picsum.photos/200"],
-      videosUrl: ["https://www.w3schools.com/html/mov_bbb.mp4"],
-    },
+
+    text: "I'm good, how about you?",
+    imagesUrl: ["https://picsum.photos/200", "https://picsum.photos/200"],
+    videosUrl: ["https://www.w3schools.com/html/mov_bbb.mp4"],
+
     from: "1",
   },
 ];
@@ -70,11 +72,17 @@ const MessagesPage: React.FC = ({}) => {
   const onSendMessage = (messageContent: MessageContentType) => {
     const { text = "", imagesUrl = [], videosUrl = [] } = messageContent || {};
     if (text || (imagesUrl && imagesUrl.length > 0) || (videosUrl && videosUrl.length > 0)) {
-      const newMessage = {
-        _id: Date.now().toString(),
-        messageContent: messageContent,
+      const newMessage: Message = {
+        text: messageContent?.text,
+        imagesUrl: messageContent?.imagesUrl,
+        videosUrl: messageContent?.videosUrl,
         from: currentUser?._id || "1",
+        to: params?.id,
       };
+      if (socket) {
+        console.log("message_page", params.id);
+        socket.emit("new_message", params.id);
+      }
       setMessages((prevMessages) => [...prevMessages, newMessage]);
     }
   };
@@ -91,11 +99,7 @@ const MessagesPage: React.FC = ({}) => {
       <div className='message-section__messages' ref={messageContainerRef}>
         {messages.length !== 0 ? (
           messages.map((message, key) => (
-            <MessageContent
-              key={key}
-              messageContent={message.messageContent}
-              isUser={currentUser?._id === message.from}
-            />
+            <MessageContent key={key} message={message} isUser={currentUser?._id === message.from} />
           ))
         ) : (
           <Empty description='Start The conversation' />
