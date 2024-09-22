@@ -7,7 +7,7 @@ interface ConversationCardProps {
   userName: string;
   userImage?: string;
   lastMessage?: string;
-  newMessages?: number;
+  unseenMessageCount?: number;
   onClick: () => void;
   isOpen: boolean;
 }
@@ -15,7 +15,7 @@ interface ConversationCardProps {
 const ConversationCard: React.FC<ConversationCardProps> = ({
   userName,
   lastMessage,
-  newMessages,
+  unseenMessageCount,
   userImage,
   onClick,
   isOpen,
@@ -44,11 +44,9 @@ const ConversationCard: React.FC<ConversationCardProps> = ({
           </div>
         </div>
         <div className='header-actions'>
-          <Badge
-            className='site-badge-count-109'
-            count={newMessages ? 109 : 0}
-            style={{ backgroundColor: "#ff4d4f" }}
-          />
+          {(unseenMessageCount ?? 0) > 0 && (
+            <Badge className='site-badge-count-109' count={unseenMessageCount} style={{ backgroundColor: "#ff4d4f" }} />
+          )}
         </div>
       </div>
     </Card>

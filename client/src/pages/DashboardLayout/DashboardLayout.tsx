@@ -5,7 +5,7 @@ import { Layout } from "antd";
 import { Content } from "antd/es/layout/layout";
 import AddUserToChatModal from "../../components/organisms/AddUserToChat/AddUserToChatModal";
 import UpdateProfilModal from "../../components/organisms/UpdateProfilModal/UpdateProfilModal";
-import { logout, selectCurrentUser, updateCurrentUser } from "../../features/auth/authSlice";
+import { fetchCurrentUser, logout, selectCurrentUser, updateCurrentUser } from "../../features/auth/authSlice";
 import { store } from "../../store/store";
 import SideBar from "../../components/templates/SideBar/SideBar";
 import { useAppSelector } from "../../store/hooks";
@@ -30,7 +30,9 @@ const DashboardLayout = () => {
       navigate("/login");
     }
   }, [currentUser, navigate]);
-
+  useEffect(() => {
+    store.dispatch(fetchCurrentUser());
+  }, []);
   return (
     <Layout style={{ marginLeft: "80px", height: "100vh" }}>
       <SideBar

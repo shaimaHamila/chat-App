@@ -1,7 +1,7 @@
 export type Message = {
   _id?: any;
   sender?: string;
-  reciver?: string;
+  receiver?: string;
   text?: string;
   imagesUrl?: string[];
   videosUrl?: string[];

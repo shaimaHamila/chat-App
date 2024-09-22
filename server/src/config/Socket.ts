@@ -48,28 +48,48 @@ const SocketConnect = (app: express.Application) => {
         profile_pic: userDetails?.profile_pic,
         online: onlineUser.has(id),
       };
+
+      //Get previous messages
+      const conversationMessages = await Conversation.findOne({
+        $or: [
+          {
+            sender: id,
+            receiver: currentUser?._id?.toString(),
+          },
+          {
+            sender: currentUser?._id?.toString(),
+            receiver: id,
+          },
+        ],
+      })
+        .populate("messages")
+        .sort({ updatedAt: -1 });
+
       socket.emit("message-user-details", payload);
+      socket.emit("message", conversationMessages?.messages);
     });
 
     //Send message
     socket.on("new_message", async (message) => {
       //Check if the conversation is available
 
-      console.log(
-        chalk.bgCyan("new_message", JSON.stringify(message, null, 2))
-      );
-
       let conversation = await Conversation.findOne({
-        "&or": [
-          { sender: message?.reciver, reciver: message?.sender },
-          { sender: message?.sender, reciver: message?.reciver },
+        $or: [
+          {
+            sender: message?.receiver.toString(),
+            receiver: message?.sender.toString(),
+          },
+          {
+            sender: message?.sender.toString(),
+            receiver: message?.receiver.toString(),
+          },
         ],
       });
 
       if (!conversation) {
         const newConversation = new Conversation({
           sender: currentUser?._id,
-          reciver: message?.reciver,
+          receiver: message?.receiver,
         });
         conversation = await newConversation.save();
       }
@@ -79,24 +99,71 @@ const SocketConnect = (app: express.Application) => {
         imagesUrl: message?.imagesUrl,
         videosUrl: message?.videosUrl,
         sender: message?.sender,
-        reciver: message?.reciver,
+        receiver: message?.receiver,
       });
       const savedMessage = await newMessage.save();
 
-      const updateConversation = await Conversation.updateOne(
+      await Conversation.updateOne(
         { _id: conversation?._id },
         {
           $push: { messages: savedMessage?._id },
         }
       );
 
-      const getConversation = await Conversation.findById(conversation?._id);
+      const getConversation = await Conversation.findById(conversation?._id)
+        .populate("messages")
+        .sort({ updatedAt: -1 });
 
-      console.log(chalk.bgGreen("Conversation", getConversation));
-      // io.to(message.reciver).emit(
-      //   "new_message",
-      //   JSON.stringify(message, null, 2)
-      // );
+      io.to(message?.receiver?.toString()).emit(
+        "message",
+        getConversation?.messages
+      );
+      io.to(message?.sender?.toString()).emit(
+        "message",
+        getConversation?.messages
+      );
+    });
+
+    //Sidebar List of conversations
+
+    socket.on("sidebar", async (currentUserId) => {
+      console.log("current User Id", currentUserId);
+      if (currentUserId) {
+        const currentUserConversations = await Conversation.find({
+          $or: [
+            {
+              sender: currentUserId,
+            },
+            {
+              receiver: currentUserId,
+            },
+          ],
+        })
+          .sort({ updatedAt: -1 })
+          .populate("messages")
+          .populate("sender")
+          .populate("receiver");
+
+        const conversations = currentUserConversations.map((conversation) => {
+          const countUnseenMessage = conversation?.messages?.reduce(
+            (prev: number, curr: any) => prev + (curr?.seen === false ? 1 : 0),
+            0
+          );
+          return {
+            _id: conversation?._id,
+            sender: conversation?.sender,
+            receiver: conversation?.receiver,
+            unseenMessageCount: countUnseenMessage,
+            lastMessage:
+              conversation?.messages[conversation?.messages?.length - 1],
+          };
+        });
+        console.log(
+          chalk.bgBlack("All current user conversations ", conversations)
+        );
+
+        socket.emit("conversation", conversations);
+      }
     });
 
     //Disconnect

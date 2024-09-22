@@ -3,9 +3,10 @@ import Search, { SearchProps } from "antd/es/input/Search";
 import { Button, Divider, Empty, Spin } from "antd";
 import "./ChatConversationList.scss";
 import ConversationCard from "../ChatUserCard/ConversationCard";
+import { Conversation } from "../../../../types/Conversation";
 
 interface ChatConversationListProps {
-  conversations: any[];
+  conversations: Conversation[];
   handleSelectConversationCard: (id: any) => void;
   isloading: boolean;
   defaultSelectedConversationId: number | null;
@@ -71,10 +72,10 @@ const ChatConversationList: React.FC<ChatConversationListProps> = ({
               {conversations.map((conversation, key) => (
                 <ConversationCard
                   key={key}
-                  id={conversation.id}
-                  userName={conversation.user.name}
-                  lastMessage={"12dfdfdf"}
-                  newMessages={5}
+                  id={conversation._id}
+                  userName={conversation?.sender?.name || "User"}
+                  lastMessage={conversation?.lastMessage?.text || "File"}
+                  unseenMessageCount={conversation?.unseenMessageCount}
                   onClick={() => onSelectConversationCard(conversation._id)}
                   isOpen={selectedConversationCard === conversation._id}
                 />

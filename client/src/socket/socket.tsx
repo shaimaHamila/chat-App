@@ -2,8 +2,8 @@ import { createContext, ReactNode, useEffect, useState } from "react";
 import { io, Socket } from "socket.io-client";
 import { store } from "../store/store";
 import { setOnlineUsers } from "../features/user/userSlice";
-import { useAppSelector } from "../store/hooks";
 import { selectCurrentUserId } from "../features/auth/authSlice";
+import { useSelector } from "react-redux";
 
 // Create a context for Socket
 export const SocketContext = createContext<Socket | null>(null);
@@ -14,7 +14,7 @@ interface SocketProviderProps {
 
 export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
   const [socketInstance, setSocketInstance] = useState<Socket | null>(null);
-  const currentUserId = useAppSelector(selectCurrentUserId);
+  const currentUserId = useSelector(selectCurrentUserId);
 
   const token = localStorage.getItem("token");
   useEffect(() => {

@@ -7,7 +7,7 @@ const conversationSchema = new mongoose.Schema(
       required: true,
       ref: "User",
     },
-    reciver: {
+    receiver: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
       ref: "User",
@@ -15,7 +15,7 @@ const conversationSchema = new mongoose.Schema(
     messages: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Messsage",
+        ref: "Message",
       },
     ],
     isDeleted: {

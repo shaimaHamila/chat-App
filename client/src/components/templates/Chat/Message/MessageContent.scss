@@ -35,6 +35,13 @@
     color: #333;
     backdrop-filter: blur(2px);
   }
+  .message__time {
+    margin: 0;
+    text-align: right;
+    color: var(--gray-700);
+    font-weight: 400;
+    margin-top: -10px;
+  }
   &__media {
     object-fit: cover;
     max-width: 300px;
