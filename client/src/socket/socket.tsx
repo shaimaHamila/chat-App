@@ -18,11 +18,13 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
 
   const token = localStorage.getItem("token");
   useEffect(() => {
+    console.log("SocketProvider currentUserId", currentUserId);
     if (currentUserId) {
       // Create a new socket connection
       const newSocketConnection = io(import.meta.env.VITE_BACKEND_URL, {
         auth: { token },
       });
+      console.log("if currentUserId", currentUserId);
 
       // Handle socket events
       newSocketConnection.on("connect", () => {

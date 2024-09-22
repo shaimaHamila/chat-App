@@ -6,14 +6,24 @@ const MessageSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
-    imageUrl: {
+    imagesUrl: {
       type: [String],
       default: [],
     },
-    videoUrl: { type: [String], default: [] },
+    videosUrl: { type: [String], default: [] },
     seen: {
       type: Boolean,
       default: false,
+    },
+    sender: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "user",
+      required: true,
+    },
+    reciver: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "user",
+      required: true,
     },
     isDeleted: {
       type: Boolean,

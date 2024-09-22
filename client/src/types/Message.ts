@@ -1,8 +1,10 @@
 export type Message = {
   _id?: any;
-  from?: string;
-  to?: string;
-  messageContent: MessageContent;
+  sender?: string;
+  reciver?: string;
+  text?: string;
+  imagesUrl?: string[];
+  videosUrl?: string[];
   seen?: Boolean;
   updatedAt?: string;
   createdAt?: string;
