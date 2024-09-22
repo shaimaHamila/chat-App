@@ -10,8 +10,9 @@ interface MessageProps {
 const MessageContent: React.FC<MessageProps> = ({ message, isUser }) => {
   return (
     <div style={{ whiteSpace: "pre-wrap" }} className={`message ${isUser ? "message--user" : "message--other"}`}>
-      <p className='message__text'> {message?.text}</p>
-
+      <div className={`text-container ${isUser ? "text--user" : "text--other"}`}>
+        <p className={`message__text`}> {message?.text}</p>
+      </div>
       {message?.imagesUrl?.map((imageUrl, index) => (
         <Image key={index} src={imageUrl} alt='message' className='message__media' />
       ))}

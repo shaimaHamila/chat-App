@@ -1,27 +1,39 @@
 .message {
-  padding: 10px 15px;
+  // padding: 10px 15px;
   margin: 5px 0;
-  border-radius: 10px;
   max-width: 70%;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
   flex-wrap: nowrap;
-  align-items: flex-start;
   &--user {
     align-self: flex-end;
-    background-color: var(--primary-400);
-    color: white;
+    text-align: right;
+    align-items: flex-end;
   }
 
   &--other {
     align-self: flex-start;
-    background-color: #d9d9d9;
-    color: #333;
+    align-items: flex-start;
   }
   &__text {
     word-wrap: break-word;
     margin: 0px;
+  }
+  .text-container {
+    padding: 10px 15px;
+    border-radius: 10px;
+  }
+  .text--user {
+    background-color: var(--primary-400);
+    color: white;
+    text-align: right;
+  }
+
+  .text--other {
+    background-color: rgba(217, 217, 217, 0.642);
+    color: #333;
+    backdrop-filter: blur(2px);
   }
   &__media {
     object-fit: cover;

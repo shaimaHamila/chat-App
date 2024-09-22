@@ -15,6 +15,16 @@ const MessageSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    sender: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "user",
+      required: true,
+    },
+    reciver: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "user",
+      required: true,
+    },
     isDeleted: {
       type: Boolean,
       default: false,
