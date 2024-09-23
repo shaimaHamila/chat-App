@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Search, { SearchProps } from "antd/es/input/Search";
 import { Button, Divider, Empty, Spin } from "antd";
 import "./ChatConversationList.scss";
@@ -7,9 +7,9 @@ import { Conversation } from "../../../../types/Conversation";
 
 interface ChatConversationListProps {
   conversations: Conversation[];
-  handleSelectConversationCard: (id: any) => void;
+  handleSelectConversationCard: (conversationId: any, receiverId: any) => void;
   isloading: boolean;
-  defaultSelectedConversationId: number | null;
+  defaultSelectedConversationId?: any;
   loadMoreConversationCards: () => void;
   isLoadMore: boolean;
   onSearchChange: (subject: string) => void;
@@ -24,15 +24,8 @@ const ChatConversationList: React.FC<ChatConversationListProps> = ({
   isLoadMore,
   onSearchChange,
 }) => {
-  const [selectedConversationCard, setSelectedConversationCard] = useState(defaultSelectedConversationId);
-
-  useEffect(() => {
-    setSelectedConversationCard(defaultSelectedConversationId);
-  }, [defaultSelectedConversationId]);
-
-  const onSelectConversationCard = (conversationId: any) => {
-    handleSelectConversationCard(conversationId);
-    setSelectedConversationCard(conversationId);
+  const onSelectConversationCard = (conversationId: any, receiverId: any) => {
+    handleSelectConversationCard(conversationId, receiverId);
   };
   const onSearch: SearchProps["onSearch"] = (value) => {
     value === "" ? onSearchChange("null") : onSearchChange(value);
@@ -72,12 +65,12 @@ const ChatConversationList: React.FC<ChatConversationListProps> = ({
               {conversations.map((conversation, key) => (
                 <ConversationCard
                   key={key}
-                  id={conversation._id}
-                  userName={conversation?.sender?.name || "User"}
-                  lastMessage={conversation?.lastMessage?.text || "File"}
+                  _id={conversation._id}
+                  userDetails={conversation?.userDetails as any}
+                  lastMessage={conversation?.lastMessage}
                   unseenMessageCount={conversation?.unseenMessageCount}
-                  onClick={() => onSelectConversationCard(conversation._id)}
-                  isOpen={selectedConversationCard === conversation._id}
+                  onClick={onSelectConversationCard}
+                  isOpen={conversation?.userDetails?._id === defaultSelectedConversationId}
                 />
               ))}
               <Button disabled={isLoadMore} onClick={loadMoreConversationCards} style={{ width: "100%" }}>

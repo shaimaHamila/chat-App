@@ -49,6 +49,8 @@ const MessagesPage: React.FC = ({}) => {
 
   const onSendMessage = (messageContent: MessageContentType) => {
     const { text = "", imagesUrl = [], videosUrl = [] } = messageContent || {};
+    console.log("onSendMessage messageContent", messageContent);
+    console.log("imagesUrl ", imagesUrl);
     if (text || (imagesUrl && imagesUrl.length > 0) || (videosUrl && videosUrl.length > 0)) {
       const newMessage: Message = {
         text: messageContent?.text,

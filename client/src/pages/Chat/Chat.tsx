@@ -1,5 +1,5 @@
 import "./Chat.scss";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate, useParams } from "react-router-dom";
 import ChatConversationList from "../../components/templates/Chat/ChatConversationList/ChatConversationList";
 import { useContext, useEffect, useState } from "react";
 import { fetchCurrentUser, selectCurrentUser } from "../../features/auth/authSlice";
@@ -10,7 +10,15 @@ const Chat = () => {
   const socket = useContext(SocketContext);
   const currentUser = useAppSelector(selectCurrentUser);
   const [allConversations, setAllConversations] = useState([]);
+  const params = useParams<{ id: string }>();
+
+  const [selectedConversationCardReceiverId, setSelectedConversationCardReceiverId] = useState(params?.id);
+
   const navigate = useNavigate();
+
+  useEffect(() => {
+    setSelectedConversationCardReceiverId(params?.id);
+  }, [params.id]);
 
   useEffect(() => {
     store.dispatch(fetchCurrentUser());
@@ -25,15 +33,15 @@ const Chat = () => {
               ...conversation,
               userDetails: conversation.sender,
             };
-          } else if (conversation.sender._id !== currentUser?._id) {
+          } else if (conversation.sender._id != currentUser?._id) {
             return {
               ...conversation,
-              userDetails: conversation.receiver,
+              userDetails: conversation.sender,
             };
           } else {
             return {
               ...conversation,
-              userDetails: conversation.sender,
+              userDetails: conversation.receiver,
             };
           }
         });
@@ -53,12 +61,11 @@ const Chat = () => {
         onSearchChange={() => {
           // store.dispatch(setComplaintSearch(value));
         }}
-        handleSelectConversationCard={(conversationId) => {
-          if (conversationId !== null) {
-            navigate(`/chat/${conversationId}`); // Navigate to /:userId
-          }
+        handleSelectConversationCard={(_conversationId, receiverId: any) => {
+          setSelectedConversationCardReceiverId(receiverId);
+          navigate(`/chat/${receiverId}`); // Navigate to /:userId
         }}
-        defaultSelectedConversationId={1}
+        defaultSelectedConversationId={selectedConversationCardReceiverId}
       />
       <Outlet />
     </div>

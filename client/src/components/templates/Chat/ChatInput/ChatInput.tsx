@@ -20,7 +20,6 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage }) => {
   const [videoPreviews, setVideoPreviews] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [emojiPickerVisible, setEmojiPickerVisible] = useState(false);
-  const [inputValue, setInputValue] = useState("");
   const [chatForm] = Form.useForm();
   const emojiPickerRef = useRef<HTMLDivElement>(null);
 
@@ -30,28 +29,37 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage }) => {
 
     setLoading(true);
 
-    // Upload images
-    for (const file of imageFiles) {
-      const uploadPhoto = await uploadFile(file);
-      if (uploadPhoto?.url) {
-        imagesUrl.push(uploadPhoto.url);
-      }
-    }
+    // Upload images and videos concurrently
+    const imageUploadPromises = imageFiles.map((file) =>
+      uploadFile(file).then((uploadPhoto) => {
+        if (uploadPhoto?.url) {
+          imagesUrl.push(uploadPhoto.url);
+        }
+      }),
+    );
 
-    // Upload videos
-    for (const file of videoFiles) {
-      const uploadVideo = await uploadFile(file);
-      if (uploadVideo?.url) {
-        videosUrl.push(uploadVideo.url);
-      }
-    }
+    const videoUploadPromises = videoFiles.map((file) =>
+      uploadFile(file).then((uploadVideo) => {
+        if (uploadVideo?.url) {
+          videosUrl.push(uploadVideo.url);
+        }
+      }),
+    );
+
+    // Wait for all uploads to complete
+    await Promise.all([...imageUploadPromises, ...videoUploadPromises]);
 
     // Set URLs to the form fields
-    chatForm.setFieldValue("imagesUrl", imagesUrl);
-    chatForm.setFieldValue("videosUrl", videosUrl);
-
+    const messageContent = {
+      ...chatForm.getFieldsValue(),
+      imagesUrl: imagesUrl.length > 0 ? imagesUrl : [],
+      videosUrl: videosUrl.length > 0 ? videosUrl : [],
+    };
+    console.log("chat imagesUrll", imagesUrl);
+    console.log("chatForm.getFieldsValue imagesUrl", chatForm.getFieldValue("imagesUrl"));
+    console.log("chatForm.getFieldsValue videosUrl", chatForm.getFieldValue("videosUrl"));
     // Send the message
-    onSendMessage(chatForm.getFieldsValue());
+    onSendMessage(messageContent);
 
     // Reset form fields and state
     chatForm.resetFields();
@@ -60,7 +68,6 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage }) => {
     setVideoFiles([]);
     setImagePreviews([]);
     setVideoPreviews([]);
-    setInputValue("");
 
     setLoading(false);
   };
@@ -122,8 +129,8 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage }) => {
   };
   //Emoji
   const handleEmojiSelect = (emoji: any) => {
-    const newValue = chatForm.getFieldValue("text") + emoji.native;
-    setInputValue(newValue);
+    const currentValue = chatForm.getFieldValue("text") || "";
+    const newValue = currentValue + emoji.native;
     chatForm.setFieldValue("text", newValue);
   };
 
