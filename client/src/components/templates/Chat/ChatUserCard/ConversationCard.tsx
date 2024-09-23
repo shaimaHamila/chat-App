@@ -1,37 +1,39 @@
 import { Avatar, Badge, Card } from "antd";
 import "./ConversationCard.scss";
 import { UserOutlined } from "@ant-design/icons";
-
+import { Message } from "../../../../types/Message";
+import { FileImageOutlined, VideoCameraOutlined } from "@ant-design/icons";
+import { User } from "../../../../types/User";
 interface ConversationCardProps {
-  id: number;
-  userName: string;
-  userImage?: string;
-  lastMessage?: string;
+  _id: any;
+  userDetails: User;
+  lastMessage?: Message;
   unseenMessageCount?: number;
-  onClick: () => void;
+  onClick: (convId: any, receiverId: any) => void;
   isOpen: boolean;
 }
 
 const ConversationCard: React.FC<ConversationCardProps> = ({
-  userName,
+  _id,
+  userDetails,
   lastMessage,
   unseenMessageCount,
-  userImage,
   onClick,
   isOpen,
 }) => {
+  console.log("ConversationCard userDetails", userDetails);
   return (
     <Card
       className={`chatUser-card ${isOpen ? "chatUser-card--selected" : ""}`}
-      onClick={onClick}
-      // tabIndex={0}
+      onClick={() => onClick(_id, userDetails._id)}
+      // tabIndex={1}
       aria-selected={isOpen}
     >
       <div className='chatUser-card--container'>
         <div className='chatUser-card--data'>
           <Badge dot={true} color='green' offset={[-4, 5]}>
             <Avatar
-              src={userImage}
+              src={userDetails.profile_pic}
               icon={<UserOutlined />}
               size={36}
               style={{ backgroundColor: "#edd8ff", color: "#4a1d8a" }}
@@ -39,8 +41,21 @@ const ConversationCard: React.FC<ConversationCardProps> = ({
           </Badge>
 
           <div className='chatUser-card--data-text'>
-            <h3 className='chatUser-card--data-username'>{userName} </h3>
-            <h5 className='chatUser-card--data-lastMsg'>{lastMessage}</h5>
+            <h3 className='chatUser-card--data-username'>{userDetails?.name} </h3>
+            <h5 className='chatUser-card--data-lastMsg'>
+              {lastMessage?.text ||
+                (lastMessage?.imagesUrl?.length ? (
+                  <>
+                    <FileImageOutlined /> Image
+                  </>
+                ) : lastMessage?.videosUrl?.length ? (
+                  <>
+                    <VideoCameraOutlined /> Video
+                  </>
+                ) : (
+                  ""
+                ))}
+            </h5>
           </div>
         </div>
         <div className='header-actions'>

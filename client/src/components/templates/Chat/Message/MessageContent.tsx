@@ -16,9 +16,11 @@ const MessageContent: React.FC<MessageProps> = ({ message, isUser }) => {
       {message?.videosUrl?.map((videoUrl, index) => (
         <video key={index} src={videoUrl} controls muted autoPlay className='message__media' />
       ))}
-      <div className={`text-container ${isUser ? "text--user" : "text--other"}`}>
-        <p className={`message__text`}> {message?.text}</p>
-      </div>
+      {message?.text && (
+        <div className={`text-container ${isUser ? "text--user" : "text--other"}`}>
+          <p className={`message__text`}> {message?.text}</p>
+        </div>
+      )}
 
       <p className='message__time'>{moment(message?.createdAt).format("hh:mm a")}</p>
     </div>
