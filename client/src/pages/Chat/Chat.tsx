@@ -6,6 +6,7 @@ import { fetchCurrentUser, selectCurrentUser } from "../../features/auth/authSli
 import { store } from "../../store/store";
 import { SocketContext } from "../../socket/socket";
 import { useAppSelector } from "../../store/hooks";
+import { selectOnlineUsers } from "../../features/user/userSlice";
 const Chat = () => {
   const socket = useContext(SocketContext);
   const currentUser = useAppSelector(selectCurrentUser);
@@ -13,6 +14,7 @@ const Chat = () => {
   const params = useParams<{ id: string }>();
 
   const [selectedConversationCardReceiverId, setSelectedConversationCardReceiverId] = useState(params?.id);
+  const _onlineUsers = useAppSelector(selectOnlineUsers);
 
   const navigate = useNavigate();
 
@@ -58,8 +60,9 @@ const Chat = () => {
         isloading={false}
         loadMoreConversationCards={() => {}}
         isLoadMore={true}
+        onlineUsers={_onlineUsers}
         onSearchChange={() => {
-          // store.dispatch(setComplaintSearch(value));
+          // store.dispatch(setUserSearch(value));
         }}
         handleSelectConversationCard={(_conversationId, receiverId: any) => {
           setSelectedConversationCardReceiverId(receiverId);

@@ -148,12 +148,12 @@ const SocketConnect = (app: express.Application) => {
       let conversation = await Conversation.findOne({
         $or: [
           {
-            sender: currentUser?._id.toString(),
+            sender: currentUser?._id?.toString(),
             receiver: senderId.toString(),
           },
           {
-            sender: senderId.toString(),
-            receiver: currentUser?._id.toString(),
+            sender: senderId?.toString(),
+            receiver: currentUser?._id?.toString(),
           },
         ],
       });
@@ -164,10 +164,10 @@ const SocketConnect = (app: express.Application) => {
       );
       const conversationsSender = await fetchConversations(senderId);
       const conversationsReceiver = await fetchConversations(
-        currentUser?._id.toString()
+        currentUser?._id?.toString()
       );
       io.to(senderId?.toString()).emit("conversation", conversationsSender);
-      io.to(currentUser?._id.toString()).emit(
+      io.to(currentUser?._id?.toString()).emit(
         "conversation",
         conversationsReceiver
       );
