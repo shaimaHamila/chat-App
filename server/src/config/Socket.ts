@@ -144,21 +144,34 @@ const SocketConnect = (app: express.Application) => {
       const conversations = await fetchConversations(currentUserId);
       socket.emit("conversation", conversations);
     });
-    socket.on("seen", async (mesgByUserId) => {
+    socket.on("seen", async (senderId) => {
       let conversation = await Conversation.findOne({
         $or: [
           {
             sender: currentUser?._id.toString(),
-            receiver: mesgByUserId?.sender.toString(),
+            receiver: senderId.toString(),
           },
           {
-            sender: mesgByUserId?.sender.toString(),
+            sender: senderId.toString(),
             receiver: currentUser?._id.toString(),
           },
         ],
       });
+      const conversationMessageId = conversation?.messages || [];
+      const updateMessages = await Message.updateMany(
+        { _id: { $in: conversationMessageId }, sender: senderId },
+        { $set: { seen: true } }
+      );
+      const conversationsSender = await fetchConversations(senderId);
+      const conversationsReceiver = await fetchConversations(
+        currentUser?._id.toString()
+      );
+      io.to(senderId?.toString()).emit("conversation", conversationsSender);
+      io.to(currentUser?._id.toString()).emit(
+        "conversation",
+        conversationsReceiver
+      );
     });
-
     //Disconnect
     socket.on("disconnect", () => {
       onlineUser.delete(currentUser?._id);

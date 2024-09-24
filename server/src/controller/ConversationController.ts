@@ -19,7 +19,13 @@ export const fetchConversations = async (userId: any) => {
 
     const conversations = currentUserConversations.map((conversation) => {
       const countUnseenMessage = conversation?.messages?.reduce(
-        (prev: number, curr: any) => prev + (curr?.seen === false ? 1 : 0),
+        (prev: any, curr: any) => {
+          if (curr?.sender._id.toString() !== userId.toString()) {
+            return prev + (curr?.seen === false ? 1 : 0);
+          } else {
+            return prev;
+          }
+        },
         0
       );
       return {
