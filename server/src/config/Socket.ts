@@ -6,6 +6,7 @@ import getUserDetailsFromToken from "../helpers/getUserDetailsFromToken";
 import User from "../models/User";
 import Conversation from "../models/Conversation";
 import Message from "../models/Message";
+import { fetchConversations } from "../controller/ConversationController";
 
 const SocketConnect = (app: express.Application) => {
   console.log(chalk.green("Socket is running... 🥳"));
@@ -122,48 +123,40 @@ const SocketConnect = (app: express.Application) => {
         "message",
         getConversation?.messages
       );
+
+      //Send Conversations
+      const conversationsSender = await fetchConversations(message?.sender);
+      const conversationsReceiver = await fetchConversations(message?.receiver);
+      io.to(message?.sender?.toString()).emit(
+        "conversation",
+        conversationsSender
+      );
+      io.to(message?.receiver?.toString()).emit(
+        "conversation",
+        conversationsReceiver
+      );
     });
 
     //Sidebar List of conversations
 
     socket.on("sidebar", async (currentUserId) => {
       console.log("current User Id", currentUserId);
-      if (currentUserId) {
-        const currentUserConversations = await Conversation.find({
-          $or: [
-            {
-              sender: currentUserId,
-            },
-            {
-              receiver: currentUserId,
-            },
-          ],
-        })
-          .sort({ updatedAt: -1 })
-          .populate("messages")
-          .populate("sender")
-          .populate("receiver");
-
-        const conversations = currentUserConversations.map((conversation) => {
-          const countUnseenMessage = conversation?.messages?.reduce(
-            (prev: number, curr: any) => prev + (curr?.seen === false ? 1 : 0),
-            0
-          );
-          return {
-            _id: conversation?._id,
-            sender: conversation?.sender,
-            receiver: conversation?.receiver,
-            unseenMessageCount: countUnseenMessage,
-            lastMessage:
-              conversation?.messages[conversation?.messages?.length - 1],
-          };
-        });
-        console.log(
-          chalk.bgBlack("All current user conversations ", conversations)
-        );
-
-        socket.emit("conversation", conversations);
-      }
+      const conversations = await fetchConversations(currentUserId);
+      socket.emit("conversation", conversations);
+    });
+    socket.on("seen", async (mesgByUserId) => {
+      let conversation = await Conversation.findOne({
+        $or: [
+          {
+            sender: currentUser?._id.toString(),
+            receiver: mesgByUserId?.sender.toString(),
+          },
+          {
+            sender: mesgByUserId?.sender.toString(),
+            receiver: currentUser?._id.toString(),
+          },
+        ],
+      });
     });
 
     //Disconnect

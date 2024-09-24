@@ -45,7 +45,7 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
         socketInstance.disconnect();
       }
     };
-  }, []);
+  }, [currentUserId]);
 
   return <SocketContext.Provider value={socketInstance}>{children}</SocketContext.Provider>;
 };

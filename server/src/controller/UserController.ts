@@ -5,8 +5,13 @@ import getUserDetailsFromToken from "../helpers/getUserDetailsFromToken";
 export const getCurrentUserDetails = async (req: Request, res: Response) => {
   try {
     const token = req.cookies.token || "";
-    const user = await getUserDetailsFromToken(token);
-
+    const user: any = await getUserDetailsFromToken(token);
+    if (user?.logout) {
+      return res.status(401).json({
+        message: user.message,
+        success: false,
+      });
+    }
     return res.status(200).json({
       message: "User details",
       data: user,
@@ -46,6 +51,12 @@ export const updateUser = async (req: Request, res: Response) => {
     console.log("req.cookies.token: ", req.cookies.token);
 
     const user: any = await getUserDetailsFromToken(token);
+    if (user?.logout) {
+      return res.status(401).json({
+        message: user.message,
+        success: false,
+      });
+    }
     console.log("user: ", user);
     const { name, profile_pic } = req.body;
     const updatedUser = await User.updateOne(
