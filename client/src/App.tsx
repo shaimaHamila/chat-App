@@ -22,6 +22,7 @@ function App() {
       } catch (error) {
         // If an error occurs, reset the current user state and remove tokens
         localStorage.removeItem("token");
+
         setIsLoading(false);
       }
     };
