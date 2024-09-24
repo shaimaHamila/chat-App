@@ -34,7 +34,7 @@ const MessagesPage: React.FC = ({}) => {
 
     if (socket) {
       socket.emit("message-page", params.id);
-
+      socket.emit("seen", params.id);
       socket.on("message-user-details", (data) => {
         console.log("user Details", data);
         setUserData(data);

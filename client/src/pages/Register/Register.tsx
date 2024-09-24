@@ -131,7 +131,7 @@ const Register: React.FC = () => {
           </Form.Item>
           <Text strong>
             Already have an account?{" "}
-            <Link to='/email' relative='path'>
+            <Link to='/login' relative='path'>
               Login
             </Link>
           </Text>

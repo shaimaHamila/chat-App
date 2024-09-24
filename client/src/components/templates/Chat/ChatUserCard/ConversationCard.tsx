@@ -21,7 +21,6 @@ const ConversationCard: React.FC<ConversationCardProps> = ({
   onClick,
   isOpen,
 }) => {
-  console.log("ConversationCard userDetails", userDetails);
   return (
     <Card
       className={`chatUser-card ${isOpen ? "chatUser-card--selected" : ""}`}

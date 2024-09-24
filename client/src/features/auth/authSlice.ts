@@ -3,6 +3,7 @@ import { User } from "../../types/User";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { RootState } from "../../store/store";
+import Cookies from "js-cookie";
 
 interface initialStatePrps {
   status: "idle" | "loading" | "succeeded" | "failed";
@@ -24,7 +25,7 @@ export const signup = createAsyncThunk<User, User>("auth/signup", async (newUser
     return response.data.data;
   } catch (error: any) {
     toast.error(error?.response?.data?.message);
-    return error?.response?.data?.message;
+    throw error?.response?.data?.message;
   }
 });
 
@@ -38,13 +39,11 @@ export const login = createAsyncThunk<User, User>("auth/login", async ({ email, 
       withCredentials: true, // Ensure cookies are included
     });
     toast.success(response?.data?.message);
-    localStorage.setItem("user", response?.data?.data?.name);
+
     localStorage.setItem("token", response?.data?.token);
-    console.log("response.data: ", response?.data);
     return response.data.data;
   } catch (error: any) {
-    toast.error(error?.response?.data?.message);
-    return error?.response?.data?.message;
+    throw error?.response?.data?.message;
   }
 });
 
@@ -57,13 +56,11 @@ export const logout = createAsyncThunk<void, void>("auth/logout", async () => {
       withCredentials: true, // Ensure cookies are included
     });
     toast.success(response?.data?.message);
-    localStorage.removeItem("user");
     localStorage.removeItem("token");
 
     return response.data;
   } catch (error: any) {
-    toast.error(error?.response?.data?.message);
-    return error?.response?.data?.message;
+    throw error?.response?.data?.message;
   }
 });
 
@@ -78,10 +75,7 @@ export const fetchCurrentUser = createAsyncThunk<User, void>("auth/fetchCurrentU
     });
     return response.data.data;
   } catch (error: any) {
-    toast.error(error?.response?.data?.message);
-    console.log("Current User Details fron store: ", error?.response?.data?.message);
-
-    return error?.response?.data?.message;
+    throw error?.response?.data?.message;
   }
 });
 export const updateCurrentUser = createAsyncThunk<User, User>("auth/updateCurrentUser", async (updatedUser: User) => {
@@ -93,14 +87,9 @@ export const updateCurrentUser = createAsyncThunk<User, User>("auth/updateCurren
       withCredentials: true,
     });
     toast.success(response?.data?.message);
-    console.log("Updated User: ", response.data);
     return response.data.data;
   } catch (error: any) {
-    toast.error(error?.message);
-    console.log("error fron store1: ", error?.response?.data?.message);
-    console.log("error fron store2: ", error);
-
-    return error?.response?.data?.message;
+    throw error?.response?.data?.message;
   }
 });
 
@@ -119,6 +108,8 @@ const authSlice = createSlice({
     builder.addCase(fetchCurrentUser.rejected, (state, action) => {
       state.status = "failed";
       state.error = action.error.message as string;
+      localStorage.removeItem("token");
+      Cookies.remove("token");
     });
     builder.addCase(signup.pending, (state) => {
       state.status = "loading";
@@ -130,6 +121,7 @@ const authSlice = createSlice({
     builder.addCase(signup.rejected, (state, action) => {
       state.status = "failed";
       state.error = action.error.message as string;
+      toast.error(state.error);
     });
     builder.addCase(login.pending, (state) => {
       state.status = "loading";
@@ -141,6 +133,7 @@ const authSlice = createSlice({
     builder.addCase(login.rejected, (state, action) => {
       state.status = "failed";
       state.error = action.error.message as string;
+      toast.error(state.error);
     });
     builder.addCase(updateCurrentUser.pending, (state) => {
       state.status = "loading";
@@ -152,6 +145,7 @@ const authSlice = createSlice({
     builder.addCase(updateCurrentUser.rejected, (state, action) => {
       state.status = "failed";
       state.error = action.error.message as string;
+      toast.error(state.error);
     });
     builder.addCase(logout.pending, (state) => {
       state.status = "loading";
@@ -163,6 +157,7 @@ const authSlice = createSlice({
     builder.addCase(logout.rejected, (state, action) => {
       state.status = "failed";
       state.error = action.error.message as string;
+      toast.error(state.error);
     });
   },
 });

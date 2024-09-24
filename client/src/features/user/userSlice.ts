@@ -34,8 +34,7 @@ export const fetchUsers = createAsyncThunk<{ users: User[]; totalCount: number }
       });
       return { users: response.data.data, totalCount: response.data.data.totalCount };
     } catch (error: any) {
-      toast.error(error?.response?.data?.message);
-      return error?.response?.data?.message;
+      throw error?.response?.data?.message;
     }
   },
 );
@@ -49,11 +48,10 @@ export const fetchUserData = createAsyncThunk<User, void>("user/fetchUserData", 
       method: "GET",
       withCredentials: true, // Ensure cookies are included
     });
-    console.log("User Details: ", response.data);
+
     return response.data;
   } catch (error: any) {
-    toast.error(error?.response?.data?.message);
-    return error?.response?.data?.message;
+    throw error?.response?.data?.message;
   }
 });
 
@@ -65,8 +63,7 @@ export const updateUserData = createAsyncThunk<User, User>("user/updateUserData"
     toast.success(response?.data?.message);
     return response.data.data;
   } catch (error: any) {
-    toast.error(error?.response?.data?.message);
-    return error?.response?.data?.message;
+    throw error?.response?.data?.message;
   }
 });
 
@@ -91,6 +88,7 @@ const userSlice = createSlice({
     builder.addCase(fetchUserData.rejected, (state, action) => {
       state.status = "failed";
       state.error = action.error.message as string;
+      toast.error(state.error);
     });
     builder.addCase(updateUserData.pending, (state) => {
       state.status = "loading";
@@ -101,6 +99,7 @@ const userSlice = createSlice({
     builder.addCase(updateUserData.rejected, (state, action) => {
       state.status = "failed";
       state.error = action.error.message as string;
+      toast.error(state.error);
     });
     builder.addCase(fetchUsers.pending, (state) => {
       state.status = "loading";
@@ -113,6 +112,7 @@ const userSlice = createSlice({
     builder.addCase(fetchUsers.rejected, (state, action) => {
       state.status = "failed";
       state.error = action.error.message as string;
+      toast.error(state.error);
     });
   },
 });
