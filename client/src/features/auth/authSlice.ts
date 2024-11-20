@@ -21,10 +21,10 @@ export const signup = createAsyncThunk<User, User>("auth/signup", async (newUser
   const url = `${import.meta.env.VITE_BASE_URL}/auth/register`;
   try {
     const response = await axios.post(url, newUser);
-    toast.success(response?.data?.data?.message);
+    toast.success("Registered successfully");
     return response.data.data;
   } catch (error: any) {
-    toast.error(error?.response?.data?.message);
+    toast.error("Error occures please try again");
     throw error?.response?.data?.message;
   }
 });
