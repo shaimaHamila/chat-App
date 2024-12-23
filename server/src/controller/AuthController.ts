@@ -52,7 +52,7 @@ export const registerUser = async (req: Request, res: Response) => {
   }
 };
 
-export const Login = async (req: Request, res: Response) => {
+export const Login = (io: any) => async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
 
@@ -67,7 +67,6 @@ export const Login = async (req: Request, res: Response) => {
     // Find the user by email
     const user = await User.findOne({ email });
 
-    // If user doesn't exist
     if (!user) {
       return res.status(404).json({
         message: "Email not found",
@@ -75,10 +74,8 @@ export const Login = async (req: Request, res: Response) => {
       });
     }
 
-    // Compare the provided password with the stored hashed password
     const isPasswordValid = encrypt.comparepassword(user.password, password);
 
-    // If password is incorrect
     if (!isPasswordValid) {
       return res.status(400).json({
         message: "Invalid password",
@@ -93,16 +90,16 @@ export const Login = async (req: Request, res: Response) => {
     // Set cookie options
     const cookieOptions = {
       httpOnly: true,
-      secure: true, // Ensure this is set to true in production
+      secure: true,
     };
 
-    // Send the JWT token in a cookie and return success response
+    io.emit("onlineUser");
     return res
       .cookie("token", token, cookieOptions)
       .status(200)
       .json({
         message: "Login successfully",
-        data: { id: user._id, email: user.email, name: user.name }, // Send only necessary data
+        data: { id: user._id, email: user.email, name: user.name },
         token,
         success: true,
       });
@@ -116,7 +113,7 @@ export const Login = async (req: Request, res: Response) => {
   }
 };
 
-export const logout = async (req: Request, res: Response) => {
+export const logout = (io: any) => async (req: Request, res: Response) => {
   try {
     const cookieOptions = {
       http: true,

@@ -28,4 +28,18 @@ api.interceptors.response.use(
   },
 );
 
+// Add an interceptor to set authorization header with user token before requests
+// apiClient.interceptors.request.use(
+//   function (config) {
+//     // Retrieve user token from local storage
+//     const token = LocalStorage.get("token");
+//     // Set authorization header with bearer token
+//     config.headers.Authorization = `Bearer ${token}`;
+//     return config;
+//   },
+//   function (error) {
+//     return Promise.reject(error);
+//   }
+// );
+
 export default api;

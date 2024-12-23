@@ -22,7 +22,7 @@ export class encrypt {
   static verifyToken(token: any) {
     if (!process.env.JWT_TOKEN_SECRET)
       throw new Error("TOKEN_SECRET is undefined");
-    return jwt.verify(token, process.env.JWT_TOKEN_SECRET);
+    return jwt.verify(token, process.env.JWT_TOKEN_SECRET) as jwt.JwtPayload;
   }
   static generateRefreshToken(tokenData: any) {
     if (!process.env.JWT_REFRESH_TOKEN_SECRET)
