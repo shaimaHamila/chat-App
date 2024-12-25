@@ -3,7 +3,6 @@ import express from "express";
 import { Server, Socket } from "socket.io";
 import http from "http";
 import chalk from "chalk";
-import getUserDetailsFromToken from "../helpers/getUserDetailsFromToken";
 
 const SocketConnect = (app: express.Application) => {
   console.log(chalk.green("Socket is running... 🥳"));
