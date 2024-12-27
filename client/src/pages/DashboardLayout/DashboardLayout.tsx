@@ -10,6 +10,7 @@ import { store } from "../../store/store";
 import SideBar from "../../components/templates/SideBar/SideBar";
 import { useAppSelector } from "../../store/hooks";
 import { fetchUsers, selectOnlineUsers, selectUsers, setSearchUser } from "../../features/user/userSlice";
+import { setCurrentConversationToNull } from "../../features/conversation/ConversationSlice";
 
 const userMenuItems = [
   { key: "/chat", label: "Chat", icon: <MessageOutlined /> },
@@ -20,10 +21,9 @@ const DashboardLayout = () => {
   const [isUpdateProfileModalOpen, setIsUpdateProfileModalOpen] = useState(false);
   const [isAddUserToChatModalOpen, setIsAddUserToChatModalOpen] = useState(false);
   const navigate = useNavigate();
-
   const currentUser = useAppSelector(selectCurrentUser);
   const _users = useAppSelector(selectUsers);
-  const _onlineUsers = useAppSelector(selectOnlineUsers);
+  const onlineUsers = useAppSelector(selectOnlineUsers);
   // Trigger navigation to login if user is logged out
   useEffect(() => {
     if (!currentUser) {
@@ -37,6 +37,7 @@ const DashboardLayout = () => {
     <Layout style={{ marginLeft: "80px", height: "100vh" }}>
       <SideBar
         menuItems={userMenuItems}
+        isOnline={onlineUsers?.includes(currentUser?._id) ?? false}
         userProfilePicture={currentUser?.profile_pic}
         logOut={() => {
           store.dispatch(logout()); // Dispatch the logout action
@@ -66,9 +67,12 @@ const DashboardLayout = () => {
 
       <AddUserToChatModal
         isAddUserToChatModalOpen={isAddUserToChatModalOpen}
-        onAddUserToChat={(userId: number | null) => {
-          console.log("Function not implemented, onAddUserToChat", userId);
+        onAddUserToChat={(userId: string | null) => {
+          console.log("userIdddddddddd", userId);
           if (userId !== null) {
+            //Create conversation and what if it is existing ????
+            //Remove current user form list
+            store.dispatch(setCurrentConversationToNull());
             navigate(`/chat/${userId}`); // Navigate to /:userId
           }
           setIsAddUserToChatModalOpen(false);
@@ -77,7 +81,7 @@ const DashboardLayout = () => {
         isloading={false}
         users={_users}
         onSearchUserChange={(userName) => store.dispatch(setSearchUser(userName))}
-        onlineUsers={_onlineUsers}
+        onlineUsers={onlineUsers}
       />
       <UpdateProfilModal
         isUpdateProfileModalOpen={isUpdateProfileModalOpen}

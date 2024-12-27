@@ -7,7 +7,7 @@ import { UserOutlined } from "@ant-design/icons";
 import "./AddUserToChatModal.scss";
 export interface AddUserToChatModalProps {
   isAddUserToChatModalOpen: boolean;
-  onAddUserToChat: (userId: number | null) => void;
+  onAddUserToChat: (userId: any | null) => void;
   handleClose: () => void;
   isloading: boolean;
   users: User[];
@@ -24,10 +24,10 @@ const AddUserToChatModal: React.FC<AddUserToChatModalProps> = ({
   onlineUsers,
   onSearchUserChange,
 }: AddUserToChatModalProps) => {
-  const [selectedUser, setSelectedUser] = useState<number | null>(null);
+  const [selectedUser, setSelectedUser] = useState<any | null>(null);
 
-  const handleItemClick = (id: number) => {
-    setSelectedUser((prevSelected) => (prevSelected === id ? null : id));
+  const handleItemClick = (id: any) => {
+    setSelectedUser((prevSelected: any | null) => (prevSelected === id ? null : id));
   };
 
   const onSearch: SearchProps["onSearch"] = (value) => {
@@ -65,7 +65,7 @@ const AddUserToChatModal: React.FC<AddUserToChatModalProps> = ({
               <List.Item.Meta
                 style={{ padding: "0 10px" }}
                 avatar={
-                  <Badge color='green' dot={onlineUsers.includes(item?._id)}>
+                  <Badge color={onlineUsers?.includes(item?._id) ? "green" : "red"} dot offset={[-4, 5]}>
                     <Avatar src={item?.profile_pic} icon={<UserOutlined />} />
                   </Badge>
                 }

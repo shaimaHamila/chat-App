@@ -32,7 +32,6 @@ const ChatConversationList: React.FC<ChatConversationListProps> = ({
   const onSearch: SearchProps["onSearch"] = (value) => {
     value === "" ? onSearchChange("null") : onSearchChange(value);
   };
-
   return (
     <div className='ChatConversationList-container'>
       <div className='ChatConversationList-search'>
@@ -73,7 +72,7 @@ const ChatConversationList: React.FC<ChatConversationListProps> = ({
                   unseenMessageCount={conversation?.unseenMessageCount}
                   onClick={onSelectConversationCard}
                   isOpen={conversation?.userDetails?._id === defaultSelectedConversationId}
-                  isOnline={onlineUsers.includes(conversation?.userDetails?._id)}
+                  isOnline={onlineUsers?.includes(conversation?.userDetails?._id)}
                 />
               ))}
               <Button disabled={isLoadMore} onClick={loadMoreConversationCards} style={{ width: "100%" }}>

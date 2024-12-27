@@ -2,11 +2,13 @@ import express, { Request, Response } from "express";
 import cors from "cors";
 import chalk from "chalk";
 import { MongoConnect } from "./config/Database";
-import AuthRouter from "./routes/AuthRouter";
 import UserRouter from "./routes/UserRouter";
 import cookieParser from "cookie-parser";
 import origins from "./config/Origins";
-import SocketConnect from "./config/Socket";
+import SocketConnect from "./config/Socket2";
+import AuthRouter from "./routes/AuthRouter";
+import ConversationRouter from "./routes/ConversationRouter";
+import MessageRouter from "./routes/MessageRouter";
 
 const app = express();
 const { server, io } = SocketConnect(app);
@@ -14,7 +16,9 @@ app.use(cors(origins));
 app.use(express.json());
 app.use(cookieParser());
 
-app.use("/api/auth", AuthRouter);
+app.use("/api/auth", AuthRouter(io));
+app.use("/api/conversation", ConversationRouter(io));
+app.use("/api/message", MessageRouter(io));
 app.use("/api/user", UserRouter);
 
 const PORT = process.env.PORT || 5000;

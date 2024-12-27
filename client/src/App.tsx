@@ -42,7 +42,7 @@ function App() {
           <Route
             path='*'
             element={
-              currentUser ? (
+              currentUser && token ? (
                 <SocketProvider>
                   <PrivateRoutes />
                 </SocketProvider>
