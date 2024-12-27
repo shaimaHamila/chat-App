@@ -4,6 +4,7 @@ import {
   deleteConversation,
   fetchUserConversations,
   getConversationById,
+  getConversationByUserId,
   updateConversation,
 } from "../controller/ConversationController";
 import { authentication } from "../middlewares/authMiddleware";
@@ -14,7 +15,8 @@ const ConversationRouter = (io: any) => {
   router.get("/", authentication, fetchUserConversations(io));
   router.post("/add", authentication, createConversation);
   router.get("/:id", authentication, getConversationById(io));
-  router.get("/:id", authentication, updateConversation(io));
+  router.get("/user/:id", authentication, getConversationByUserId(io));
+  router.put("/:id", authentication, updateConversation(io));
   router.get("/:id", authentication, deleteConversation);
   return router;
 };

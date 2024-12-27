@@ -12,6 +12,7 @@ interface initialStatePrps {
   searchedUserName: string;
   totalCount: number | null;
   onlineUsers: String[]; //TODO
+  userById: User | null;
 }
 
 const initialState: initialStatePrps = {
@@ -21,6 +22,7 @@ const initialState: initialStatePrps = {
   searchedUserName: "",
   totalCount: null,
   onlineUsers: [],
+  userById: null,
 };
 export const fetchUsers = createAsyncThunk<{ users: User[]; totalCount: number }, void>(
   "user/fetchUsers",
@@ -40,7 +42,7 @@ export const fetchUsers = createAsyncThunk<{ users: User[]; totalCount: number }
 );
 
 export const fetchUserData = createAsyncThunk<User, void>("user/fetchUserData", async () => {
-  const url = `${import.meta.env.VITE_BASE_URL}/api/user/current-user-details`;
+  const url = `${import.meta.env.VITE_BASE_URL}/user/current-user-details`;
 
   try {
     const response = await axios({
@@ -66,7 +68,14 @@ export const updateUserData = createAsyncThunk<User, User>("user/updateUserData"
     throw error?.response?.data?.message;
   }
 });
-
+export const getUserById = createAsyncThunk<User, string>("user/getUserById", async (id: string) => {
+  try {
+    const response = await api.get(`/user/${id}`);
+    return response.data.data;
+  } catch (error: any) {
+    throw error?.response?.data?.message;
+  }
+});
 const userSlice = createSlice({
   name: "user",
   initialState,
@@ -114,6 +123,20 @@ const userSlice = createSlice({
       state.error = action.error.message as string;
       toast.error(state.error);
     });
+
+    builder.addCase(getUserById.pending, (state) => {
+      state.status = "loading";
+      state.userById = null;
+    });
+    builder.addCase(getUserById.fulfilled, (state, action) => {
+      state.status = "idle";
+      state.userById = action.payload;
+    });
+    builder.addCase(getUserById.rejected, (state, action) => {
+      state.status = "failed";
+      state.error = action.error.message as string;
+      toast.error(state.error);
+    });
   },
 });
 
@@ -134,5 +157,6 @@ export const selectOnlineUsers = (state: RootState) => state.user.onlineUsers;
 export const selectTotalCount = (state: RootState) => state.user.totalCount;
 
 export const selectError = (state: RootState) => state.auth.error;
+export const selectUserById = (state: RootState) => state.user.userById;
 
 export default userSlice.reducer;

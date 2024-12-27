@@ -22,7 +22,8 @@ export const getCurrentUserDetails = async (req: Request, res: Response) => {
 
 export const getUserById = async (req: Request, res: Response) => {
   try {
-    const { id } = req.query;
+    const { id } = req.params;
+    console.log("id: ", id);
     const user = await User.findById(id).select("-password");
     if (!user) {
       return res.status(400).json({

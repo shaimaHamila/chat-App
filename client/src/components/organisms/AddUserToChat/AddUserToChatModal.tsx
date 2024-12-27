@@ -65,7 +65,7 @@ const AddUserToChatModal: React.FC<AddUserToChatModalProps> = ({
               <List.Item.Meta
                 style={{ padding: "0 10px" }}
                 avatar={
-                  <Badge color='green' dot={onlineUsers.includes(item?._id)}>
+                  <Badge color={onlineUsers?.includes(item?._id) ? "green" : "red"} dot offset={[-4, 5]}>
                     <Avatar src={item?.profile_pic} icon={<UserOutlined />} />
                   </Badge>
                 }

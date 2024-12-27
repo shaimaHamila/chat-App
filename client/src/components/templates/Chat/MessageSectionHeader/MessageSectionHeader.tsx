@@ -16,7 +16,7 @@ const MessageSectionHeader: React.FC<MessageSectionHeaderProps> = ({ userName, u
     <div className='header-component'>
       <div className='header-component__user'>
         <div className='header-info'>
-          <Badge dot={isOnline} color='green' offset={[-4, 5]}>
+          <Badge dot color={isOnline ? "green" : "red"} offset={[-4, 5]}>
             <Avatar
               src={userImage}
               icon={<UserOutlined />}

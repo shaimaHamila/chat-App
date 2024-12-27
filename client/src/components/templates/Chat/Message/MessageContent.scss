@@ -1,11 +1,11 @@
 .message {
-  // padding: 10px 15px;
   margin: 5px 0;
   max-width: 70%;
   display: flex;
-  flex-direction: column;
+  flex-direction: column; /* Column direction for both the user and the other user */
   gap: 0.5rem;
   flex-wrap: nowrap;
+
   &--user {
     align-self: flex-end;
     text-align: right;
@@ -15,32 +15,66 @@
   &--other {
     align-self: flex-start;
     align-items: flex-start;
+    display: flex;
+    flex-direction: row; /* Flex row for messages from other users */
+    gap: 10px; /* Space between profile image and message content */
   }
+
+  /* Profile Image for Other User's Messages */
+  .message__user-image {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 10px;
+    align-self: flex-start;
+  }
+
+  .message__user-image--img {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
   &__text {
     word-wrap: break-word;
     margin: 0px;
   }
+
   .text-container {
     padding: 6px 10px;
     border-radius: 10px;
   }
+
   .text--user {
     background-color: var(--primary-400);
     color: white;
     text-align: right;
+    width: fit-content;
   }
-
+  .message__text-container {
+    display: flex;
+    justify-content: flex-end;
+  }
   .text--other {
     background-color: rgba(217, 217, 217, 0.642);
     color: #333;
     backdrop-filter: blur(2px);
+    width: fit-content;
   }
+
   .message__time {
     margin: 0;
     text-align: right;
     color: var(--gray-700);
     font-weight: 400;
     margin-top: -10px;
+  }
+  .message__content {
+    display: flex;
+    gap: 0.5rem;
+    flex-direction: column;
+    flex-wrap: nowrap;
   }
   &__media {
     object-fit: cover;

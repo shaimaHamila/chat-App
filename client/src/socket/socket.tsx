@@ -4,6 +4,13 @@ import { store } from "../store/store";
 import { setOnlineUsers } from "../features/user/userSlice";
 import { selectCurrentUserId } from "../features/auth/authSlice";
 import { useSelector } from "react-redux";
+import { Conversation } from "../types/Conversation";
+import {
+  setConversationsFromSocket,
+  updateConversationFromSocket,
+  updateCurrentConversationWithNewMessageFromSocket,
+} from "../features/conversation/ConversationSlice";
+import { Message } from "../types/Message";
 
 // Create a context for Socket
 export const SocketContext = createContext<Socket | null>(null);
@@ -18,18 +25,26 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
 
   const token = localStorage.getItem("token");
   useEffect(() => {
-    console.log("SocketProvider currentUserId", currentUserId);
     if (currentUserId) {
       // Create a new socket connection
       const newSocketConnection = io(import.meta.env.VITE_BACKEND_URL, {
         auth: { token },
       });
-      console.log("if currentUserId", currentUserId);
 
       // Handle socket events
       newSocketConnection.on("connect", () => {
+        newSocketConnection.emit("joinRoom");
         newSocketConnection.on("onlineUser", (onlineUsers: string[]) => {
           store.dispatch(setOnlineUsers(onlineUsers));
+        });
+        newSocketConnection.on("conversationUpdate", (updatedConversation: Conversation) => {
+          store.dispatch(updateConversationFromSocket(updatedConversation));
+        });
+        newSocketConnection.on("getConversations", (conversations: Conversation[]) => {
+          store.dispatch(setConversationsFromSocket(conversations));
+        });
+        newSocketConnection.on("newMessage", (newMessage: Message) => {
+          store.dispatch(updateCurrentConversationWithNewMessageFromSocket(newMessage));
         });
       });
 

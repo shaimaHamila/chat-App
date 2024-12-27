@@ -18,6 +18,7 @@ interface SideBarProps {
   updateProfileDetails: () => void;
   addUserToChat: () => void;
   userProfilePicture?: string;
+  isOnline: boolean;
 }
 const SideBar: React.FC<SideBarProps> = ({
   menuItems,
@@ -25,6 +26,7 @@ const SideBar: React.FC<SideBarProps> = ({
   addUserToChat,
   updateProfileDetails,
   userProfilePicture,
+  isOnline,
 }: SideBarProps) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -64,7 +66,7 @@ const SideBar: React.FC<SideBarProps> = ({
         </div>
         <div className='side-menu--bottom-section'>
           <Button onClick={updateProfileDetails} className='side-menu--logout' ghost size={"large"}>
-            <Badge dot>
+            <Badge color={isOnline ? "green" : "red"} dot offset={[-4, 5]}>
               <Avatar src={userProfilePicture} size='large' icon={<UserOutlined />} />
             </Badge>
           </Button>

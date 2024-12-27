@@ -55,9 +55,6 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage }) => {
       imagesUrl: imagesUrl.length > 0 ? imagesUrl : [],
       videosUrl: videosUrl.length > 0 ? videosUrl : [],
     };
-    console.log("chat imagesUrll", imagesUrl);
-    console.log("chatForm.getFieldsValue imagesUrl", chatForm.getFieldValue("imagesUrl"));
-    console.log("chatForm.getFieldsValue videosUrl", chatForm.getFieldValue("videosUrl"));
     // Send the message
     onSendMessage(messageContent);
 

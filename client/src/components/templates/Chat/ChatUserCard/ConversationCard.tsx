@@ -32,14 +32,14 @@ const ConversationCard: React.FC<ConversationCardProps> = ({
     >
       <div className='chatUser-card--container'>
         <div className='chatUser-card--data'>
-          {/* <Badge dot={isOnline} color='green' offset={[-4, 5]}> */}
-          <Avatar
-            src={userDetails.profile_pic}
-            icon={<UserOutlined />}
-            size={36}
-            style={{ backgroundColor: "#edd8ff", color: "#4a1d8a" }}
-          ></Avatar>
-          {/* </Badge> */}
+          <Badge color={isOnline ? "green" : "red"} dot offset={[-4, 5]}>
+            <Avatar
+              src={userDetails.profile_pic}
+              icon={<UserOutlined />}
+              size={36}
+              style={{ backgroundColor: "#edd8ff", color: "#4a1d8a" }}
+            ></Avatar>
+          </Badge>
 
           <div className='chatUser-card--data-text'>
             <h3 className='chatUser-card--data-username'>{userDetails?.name} </h3>

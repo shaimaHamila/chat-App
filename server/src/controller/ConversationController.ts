@@ -108,12 +108,22 @@ export const getConversationById =
             updatedConversation?.messages.length - 1
           ],
       };
-
-      io.to(currentUser?._id).emit("conversation:read", responseConversation);
+      const getconversation = {
+        _id: updatedConversation?._id,
+        sender: updatedConversation?.sender,
+        receiver: updatedConversation?.receiver,
+        unseenMessageCount,
+        messages: updatedConversation?.messages,
+        lastMessage:
+          updatedConversation?.messages[
+            updatedConversation?.messages.length - 1
+          ],
+      };
+      io.to(currentUser?._id).emit("conversationUpdate", responseConversation);
 
       return res.status(200).json({
         message: "Conversation retrieved successfully.",
-        data: responseConversation,
+        data: getconversation,
         success: true,
       });
     } catch (error: any) {
@@ -191,6 +201,17 @@ export const getConversationByUserId =
         _id: updatedConversation?._id,
         sender: updatedConversation?.sender,
         receiver: updatedConversation?.receiver,
+        messages: updatedConversation?.messages,
+        unseenMessageCount,
+        lastMessage:
+          updatedConversation?.messages[
+            updatedConversation?.messages.length - 1
+          ],
+      };
+      const updatedConversationRes = {
+        _id: updatedConversation?._id,
+        sender: updatedConversation?.sender,
+        receiver: updatedConversation?.receiver,
         unseenMessageCount,
         lastMessage:
           updatedConversation?.messages[
@@ -199,10 +220,9 @@ export const getConversationByUserId =
       };
 
       io.to(currentUser._id.toString()).emit(
-        "conversation:read",
-        responseConversation
+        "conversationUpdate",
+        updatedConversationRes
       );
-
       return res.status(200).json({
         message: "Conversation retrieved successfully.",
         data: responseConversation,
@@ -259,10 +279,7 @@ export const fetchUserConversations =
           };
         }
       );
-      io.to(currentUser._id?.toString()).emit(
-        "conversations:read",
-        conversations
-      );
+      // io.to(currentUser._id?.toString()).emit("conversations", conversations);
       return res.status(200).json({
         message: "Conversations fetched successfully.",
         data: conversations,
@@ -318,7 +335,7 @@ export const fetchConversations = async (userId: any) => {
   }
 };
 
-// Update a conversation
+// Update a conversation with a new message
 export const updateConversation =
   (io: any) => async (req: Request, res: Response) => {
     const { id } = req.params; // Conversation ID
@@ -334,7 +351,6 @@ export const updateConversation =
           success: false,
         });
       }
-
       // Find the conversation by ID
       let conversation = await Conversation.findById(id)
         .populate("messages")
@@ -347,11 +363,10 @@ export const updateConversation =
           error: true,
         });
       }
-
       // Ensure the current user is part of the conversation
       if (
-        conversation.sender.toString() !== currentUser._id.toString() &&
-        conversation.receiver.toString() !== currentUser._id.toString()
+        conversation.sender._id.toString() !== currentUser._id.toString() &&
+        conversation.receiver._id.toString() !== currentUser._id.toString()
       ) {
         return res.status(403).json({
           message:
@@ -380,24 +395,59 @@ export const updateConversation =
         .populate("sender", "name profile_pic")
         .populate("receiver", "name profile_pic");
 
-      // Emit the updated conversation to both users
+      // Calculate unseenMessageCount (number of unseen messages for the current user)
+      const unseenMessageCount = updatedConversation?.messages?.filter(
+        (message: any) => {
+          return (
+            !message.isSeen &&
+            message.receiver.toString() === currentUser._id.toString()
+          );
+        }
+      ).length;
+
+      // Extract the last message from the conversation
+      const lastMessage =
+        conversation.messages[conversation.messages.length - 1];
+
+      // Format the response as per the required structure
+      const formattedConversation = {
+        _id: conversation._id,
+        sender: conversation.sender,
+        receiver: conversation.receiver,
+        messages: conversation.messages,
+        unseenMessageCount,
+        lastMessage,
+      };
+
+      //Send Conversations
       const conversationsSender = await fetchConversations(
-        receiver._id?.toString()
+        conversation?.sender?._id
       );
       const conversationsReceiver = await fetchConversations(
-        currentUser?._id?.toString()
+        conversation?.receiver?._id
       );
-      io.to(receiver._id?.toString()).emit(
-        "conversations:read",
+      console.log("conversationsSender", conversationsSender);
+      io.to(conversation?.sender?._id?.toString()).emit(
+        "getConversations",
         conversationsSender
       );
-      io.to(currentUser?._id?.toString()).emit(
-        "conversations:read",
+      io.to(conversation?.receiver?._id?.toString()).emit(
+        "getConversations",
         conversationsReceiver
+      );
+
+      // Emit the new message to both sender and receiver via socket
+      io.to(conversation?.sender?._id?.toString()).emit(
+        "newMessage",
+        savedMessage
+      );
+      io.to(conversation?.receiver?._id?.toString()).emit(
+        "newMessage",
+        savedMessage
       );
       return res.status(200).json({
         message: "Message added and conversation updated successfully.",
-        data: updatedConversation,
+        data: formattedConversation, // Return the formatted conversation
         success: true,
       });
     } catch (error: any) {

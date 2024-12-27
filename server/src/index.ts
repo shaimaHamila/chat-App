@@ -5,7 +5,7 @@ import { MongoConnect } from "./config/Database";
 import UserRouter from "./routes/UserRouter";
 import cookieParser from "cookie-parser";
 import origins from "./config/Origins";
-import SocketConnect from "./config/Socket";
+import SocketConnect from "./config/Socket2";
 import AuthRouter from "./routes/AuthRouter";
 import ConversationRouter from "./routes/ConversationRouter";
 import MessageRouter from "./routes/MessageRouter";
