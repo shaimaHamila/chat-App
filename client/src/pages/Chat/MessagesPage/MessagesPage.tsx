@@ -60,8 +60,7 @@ const MessagesPage: React.FC = ({}) => {
         receiver: params?.id,
       };
       if (socket) {
-        console.log("params?.id", params?.id);
-        store.dispatch(addMessage({ id: conversation?._id, newMessage: newMessage }));
+        store.dispatch(addMessage({ id: params?.id!, newMessage: newMessage }));
       }
       // setMessages((prevMessages) => [...(prevMessages || []), newMessage]);
     }
@@ -72,9 +71,7 @@ const MessagesPage: React.FC = ({}) => {
       messageContainerRef.current.scrollTop = messageContainerRef.current.scrollHeight;
     }
   }, [conversation?.messages]);
-  if (!conversation) {
-    return <p>Select a conversation to view messages</p>;
-  }
+
   return (
     <div className='message-section'>
       <MessageSectionHeader
@@ -83,7 +80,7 @@ const MessagesPage: React.FC = ({}) => {
         isOnline={onlineUsers?.includes(userData?._id)}
       />
       <div className='message-section__messages' ref={messageContainerRef}>
-        {conversation?.messages?.length !== 0 ? (
+        {conversation ? (
           conversation?.messages?.map((message, key) => (
             <MessageContent
               key={key}

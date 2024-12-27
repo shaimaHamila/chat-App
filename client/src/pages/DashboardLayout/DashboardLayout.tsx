@@ -10,6 +10,7 @@ import { store } from "../../store/store";
 import SideBar from "../../components/templates/SideBar/SideBar";
 import { useAppSelector } from "../../store/hooks";
 import { fetchUsers, selectOnlineUsers, selectUsers, setSearchUser } from "../../features/user/userSlice";
+import { setCurrentConversationToNull } from "../../features/conversation/ConversationSlice";
 
 const userMenuItems = [
   { key: "/chat", label: "Chat", icon: <MessageOutlined /> },
@@ -66,8 +67,12 @@ const DashboardLayout = () => {
 
       <AddUserToChatModal
         isAddUserToChatModalOpen={isAddUserToChatModalOpen}
-        onAddUserToChat={(userId: number | null) => {
+        onAddUserToChat={(userId: string | null) => {
+          console.log("userIdddddddddd", userId);
           if (userId !== null) {
+            //Create conversation and what if it is existing ????
+            //Remove current user form list
+            store.dispatch(setCurrentConversationToNull());
             navigate(`/chat/${userId}`); // Navigate to /:userId
           }
           setIsAddUserToChatModalOpen(false);

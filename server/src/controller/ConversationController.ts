@@ -352,16 +352,29 @@ export const updateConversation =
         });
       }
       // Find the conversation by ID
-      let conversation = await Conversation.findById(id)
+      // let conversation = await Conversation.findById(id)
+      //   .populate("messages")
+      //   .populate("sender")
+      //   .populate("receiver");
+
+      // Find the conversation by user ID
+      let conversation = await Conversation.findOne({
+        $or: [
+          { sender: currentUser._id, receiver: id },
+          { sender: id, receiver: currentUser._id },
+        ],
+      })
         .populate("messages")
-        .populate("sender")
-        .populate("receiver");
+        .populate("sender", "name profile_pic")
+        .populate("receiver", "name profile_pic");
 
       if (!conversation) {
-        return res.status(404).json({
-          message: "Conversation not found.",
-          error: true,
+        conversation = new Conversation({
+          sender: currentUser._id,
+          receiver,
+          messages: [],
         });
+        await conversation.save();
       }
       // Ensure the current user is part of the conversation
       if (
@@ -386,7 +399,7 @@ export const updateConversation =
       const savedMessage = await newMessage.save();
 
       // Add the new message to the conversation
-      conversation.messages.push(savedMessage._id);
+      conversation?.messages?.push(savedMessage._id);
       await conversation.save();
 
       // Re-fetch the updated conversation with populated fields
@@ -426,7 +439,6 @@ export const updateConversation =
       const conversationsReceiver = await fetchConversations(
         conversation?.receiver?._id
       );
-      console.log("conversationsSender", conversationsSender);
       io.to(conversation?.sender?._id?.toString()).emit(
         "getConversations",
         conversationsSender

@@ -21,6 +21,7 @@ export const addMessage = createAsyncThunk<Conversation, { id: string; newMessag
   "conversation/addMessage",
   async ({ id, newMessage }) => {
     const url = `${import.meta.env.VITE_BASE_URL}/conversation/${id.toString()}`;
+    console.log("newMessage", { id, newMessage });
 
     try {
       const response = await axios({
@@ -120,6 +121,9 @@ const conversationSlice = createSlice({
         }
       }
     },
+    setCurrentConversationToNull(state) {
+      state.currentConversation = null;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -160,6 +164,7 @@ const conversationSlice = createSlice({
       })
       .addCase(fetchConversationById.rejected, (state, action) => {
         state.status = "failed";
+        state.currentConversation = null;
         state.error = action.error.message || "Failed to fetch conversation";
       })
       // Get Conversation by User ID
@@ -192,6 +197,7 @@ const conversationSlice = createSlice({
 });
 
 export const {
+  setCurrentConversationToNull,
   updateConversationFromSocket,
   setConversationsFromSocket,
   updateCurrentConversationWithNewMessageFromSocket,
