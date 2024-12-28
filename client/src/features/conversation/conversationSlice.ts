@@ -95,6 +95,10 @@ const conversationSlice = createSlice({
       state.conversations = action.payload;
     },
     updateConversationFromSocket: (state, action: PayloadAction<Conversation>) => {
+      console.log("Updating current conversation", state.currentConversation?._id == action.payload._id);
+
+      state.currentConversation = action.payload;
+
       // Find and update the conversation in the state based on the _id
       const index = state.conversations.findIndex((conversation) => conversation._id === action.payload._id);
 
@@ -105,7 +109,7 @@ const conversationSlice = createSlice({
       }
     },
     updateCurrentConversationWithNewMessageFromSocket: (state, action: PayloadAction<Message>) => {
-      if (state.currentConversation) {
+      if (state?.currentConversation && state?.currentConversation?._id === action?.payload?._id) {
         // Ensure messages is an array
         if (!state.currentConversation.messages) {
           state.currentConversation.messages = [];
