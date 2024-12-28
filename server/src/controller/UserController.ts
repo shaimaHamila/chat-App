@@ -75,15 +75,33 @@ export const updateUser = async (req: Request, res: Response) => {
 
 export const getUsers = async (req: Request, res: Response) => {
   try {
+    const token = req.cookies.token || "";
+    console.log("req.cookies.token: ", req.cookies.token);
+
+    const user = await getUserDetailsFromToken(token);
+    if (!user) {
+      return res.status(401).json({
+        message: "Unauthorized",
+        error: true,
+      });
+    }
+
+    const currentUserId = user._id;
+
     const searchQuery =
       typeof req.query.name === "string" ? req.query.name : "";
 
-    const query = searchQuery
-      ? { name: { $regex: new RegExp(searchQuery, "i") } }
-      : {};
+    // Add condition to exclude the current user
+    const query = {
+      ...(searchQuery
+        ? { name: { $regex: new RegExp(searchQuery, "i") } }
+        : {}),
+      _id: { $ne: currentUserId }, // Exclude the current user by their ID
+    };
 
     const users = await User.find(query).select("-password");
     const totalCount = await User.countDocuments(query);
+
     return res.status(200).json({
       message: "Users retrieved successfully",
       data: users,
