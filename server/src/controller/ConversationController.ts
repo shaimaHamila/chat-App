@@ -223,6 +223,10 @@ export const getConversationByUserId =
         "conversationUpdate",
         updatedConversationRes
       );
+      // io.to(currentUser._id.toString()).emit(
+      //   "getCurrentConversation",
+      //   responseConversation
+      // );
       return res.status(200).json({
         message: "Conversation retrieved successfully.",
         data: responseConversation,
@@ -341,7 +345,7 @@ export const updateConversation =
     const { id } = req.params; // Conversation ID
     const { text, imagesUrl, videosUrl, receiver } = req.body; // Message details
     const token = req.cookies.token || "";
-
+    let isNewConversation = false;
     try {
       // Validate user authentication
       const currentUser = await getUserDetailsFromToken(token);
@@ -369,6 +373,7 @@ export const updateConversation =
         .populate("receiver", "name profile_pic");
 
       if (!conversation) {
+        isNewConversation = true;
         conversation = new Conversation({
           sender: currentUser._id,
           receiver,
@@ -403,10 +408,14 @@ export const updateConversation =
       await conversation.save();
 
       // Re-fetch the updated conversation with populated fields
-      const updatedConversation = await Conversation.findById(id)
+      const updatedConversation = await Conversation.findById(conversation._id)
         .populate("messages")
         .populate("sender", "name profile_pic")
         .populate("receiver", "name profile_pic");
+
+      if (!updatedConversation) {
+        throw new Error("Failed to update conversation.");
+      }
 
       // Calculate unseenMessageCount (number of unseen messages for the current user)
       const unseenMessageCount = updatedConversation?.messages?.filter(
@@ -420,14 +429,14 @@ export const updateConversation =
 
       // Extract the last message from the conversation
       const lastMessage =
-        conversation.messages[conversation.messages.length - 1];
+        conversation.messages[updatedConversation.messages.length - 1];
 
       // Format the response as per the required structure
       const formattedConversation = {
-        _id: conversation._id,
-        sender: conversation.sender,
-        receiver: conversation.receiver,
-        messages: conversation.messages,
+        _id: updatedConversation?._id,
+        sender: updatedConversation?.sender,
+        receiver: updatedConversation?.receiver,
+        messages: updatedConversation?.messages,
         unseenMessageCount,
         lastMessage,
       };

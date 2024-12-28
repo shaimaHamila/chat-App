@@ -41,6 +41,7 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
         newSocketConnection.on("conversationUpdate", (updatedConversation: Conversation) => {
           store.dispatch(updateConversationFromSocket(updatedConversation));
         });
+
         newSocketConnection.on("getConversations", (conversations: Conversation[]) => {
           store.dispatch(setConversationsFromSocket(conversations));
         });
