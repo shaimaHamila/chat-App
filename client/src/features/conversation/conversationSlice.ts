@@ -21,7 +21,6 @@ export const addMessage = createAsyncThunk<Conversation, { id: string; newMessag
   "conversation/addMessage",
   async ({ id, newMessage }) => {
     const url = `${import.meta.env.VITE_BASE_URL}/conversation/${id.toString()}`;
-    console.log("newMessage", { id, newMessage });
 
     try {
       const response = await axios({

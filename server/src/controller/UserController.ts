@@ -23,7 +23,6 @@ export const getCurrentUserDetails = async (req: Request, res: Response) => {
 export const getUserById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    console.log("id: ", id);
     const user = await User.findById(id).select("-password");
     if (!user) {
       return res.status(400).json({
@@ -50,7 +49,6 @@ export const updateUser = async (req: Request, res: Response) => {
   const { name, profile_pic } = req.body;
   try {
     const token = req.cookies.token || "";
-    console.log("req.cookies.token: ", req.cookies.token);
 
     const user = await getUserDetailsFromToken(token);
 
@@ -76,7 +74,6 @@ export const updateUser = async (req: Request, res: Response) => {
 export const getUsers = async (req: Request, res: Response) => {
   try {
     const token = req.cookies.token || "";
-    console.log("req.cookies.token: ", req.cookies.token);
 
     const user = await getUserDetailsFromToken(token);
     if (!user) {
