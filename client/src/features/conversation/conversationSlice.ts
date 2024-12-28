@@ -94,13 +94,10 @@ const conversationSlice = createSlice({
     setConversationsFromSocket(state, action: PayloadAction<Conversation[]>) {
       state.conversations = action.payload;
     },
+
     updateConversationFromSocket: (state, action: PayloadAction<Conversation>) => {
-      console.log("Updating current conversation", state.currentConversation?._id == action.payload._id);
-
-      state.currentConversation = action.payload;
-
       // Find and update the conversation in the state based on the _id
-      const index = state.conversations.findIndex((conversation) => conversation._id === action.payload._id);
+      const index = state.conversations?.findIndex((conversation) => conversation?._id === action.payload?._id);
 
       if (index !== -1) {
         state.conversations[index] = action.payload;
@@ -109,21 +106,26 @@ const conversationSlice = createSlice({
       }
     },
     updateCurrentConversationWithNewMessageFromSocket: (state, action: PayloadAction<Message>) => {
-      if (state?.currentConversation && state?.currentConversation?._id === action?.payload?._id) {
-        // Ensure messages is an array
-        if (!state.currentConversation.messages) {
-          state.currentConversation.messages = [];
-        }
+      const { sender, receiver, _id } = action.payload;
+      const { currentConversation } = state;
 
-        // Check if the message is already in the array by comparing unique properties (e.g., message ID)
-        const messageExists = state.currentConversation.messages.some((msg) => msg._id === action.payload._id);
+      if (currentConversation) {
+        const isRelated =
+          (currentConversation.sender?._id === sender && currentConversation.receiver?._id === receiver) ||
+          (currentConversation.sender?._id === receiver && currentConversation.receiver?._id === sender);
 
-        // Only push the new message if it does not exist in the messages array
-        if (!messageExists) {
-          state.currentConversation.messages.push(action.payload);
+        if (isRelated) {
+          // Initialize messages array if not already present
+          currentConversation.messages = currentConversation.messages || [];
+
+          // Add the new message only if it doesn't already exist in the array
+          if (!currentConversation.messages.some((msg) => msg._id === _id)) {
+            currentConversation.messages.push(action.payload);
+          }
         }
       }
     },
+
     setCurrentConversationToNull(state) {
       state.currentConversation = null;
     },
@@ -167,7 +169,7 @@ const conversationSlice = createSlice({
       })
       .addCase(fetchConversationById.rejected, (state, action) => {
         state.status = "failed";
-        state.currentConversation = null;
+        // state.currentConversation = null;
         state.error = action.error.message || "Failed to fetch conversation";
       })
       // Get Conversation by User ID
@@ -191,6 +193,7 @@ const conversationSlice = createSlice({
       })
       .addCase(addMessage.fulfilled, (state, action) => {
         state.status = "idle";
+        if (!state.currentConversation) state.currentConversation = action.payload;
       })
       .addCase(addMessage.rejected, (state, action) => {
         state.status = "failed";

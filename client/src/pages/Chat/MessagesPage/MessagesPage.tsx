@@ -1,5 +1,5 @@
 import "./MessagesPage.scss";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef } from "react";
 import ChatInput from "../../../components/templates/Chat/ChatInput/ChatInput";
 import MessageSectionHeader from "../../../components/templates/Chat/MessageSectionHeader/MessageSectionHeader";
 import { Empty } from "antd";
@@ -28,26 +28,28 @@ const MessagesPage: React.FC = ({}) => {
   const socket = useContext(SocketContext);
   const currentUser = useAppSelector(selectCurrentUser);
   const params = useParams<{ id: string }>();
+
   useEffect(() => {
     store.dispatch(fetchCurrentUser());
     if (params?.id) {
       store.dispatch(getUserById(params?.id));
       store.dispatch(getConversationByUserId(params?.id));
+      // if (socket) {
+      //   socket.emit("message-page", params.id);
+      //   socket.emit("seen", params.id);
+      //   socket.on("message-user-details", (data) => {
+      //     console.log("user Details", data);
+      //     setUserData(data);
+      //   });
+
+      //   socket.on("message", (message: Message[]) => {
+      //     console.log("message", message);
+      //     setMessages(message);
+      //   });
+      // }
+
       // setMessages(conversation?.messages || []);
     }
-    // if (socket) {
-    //   socket.emit("message-page", params.id);
-    //   socket.emit("seen", params.id);
-    //   socket.on("message-user-details", (data) => {
-    //     console.log("user Details", data);
-    //     setUserData(data);
-    //   });
-
-    //   socket.on("message", (message: Message[]) => {
-    //     console.log("message", message);
-    //     setMessages(message);
-    //   });
-    // }
   }, [params?.id]);
 
   const onSendMessage = (messageContent: MessageContentType) => {

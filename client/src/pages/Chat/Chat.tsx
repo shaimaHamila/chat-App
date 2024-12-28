@@ -1,15 +1,13 @@
 import "./Chat.scss";
 import { Outlet, useNavigate, useParams } from "react-router-dom";
 import ChatConversationList from "../../components/templates/Chat/ChatConversationList/ChatConversationList";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { fetchCurrentUser, selectCurrentUser } from "../../features/auth/authSlice";
 import { store } from "../../store/store";
-import { SocketContext } from "../../socket/socket";
 import { useAppSelector } from "../../store/hooks";
 import { selectOnlineUsers } from "../../features/user/userSlice";
 import { fetchUserConversations, selectConversations } from "../../features/conversation/ConversationSlice";
 const Chat = () => {
-  const socket = useContext(SocketContext);
   const currentUser = useAppSelector(selectCurrentUser);
   const conversations = useAppSelector(selectConversations);
   const [allConversations, setAllConversations] = useState<any[]>([]);
