@@ -22,16 +22,17 @@ const SocketConnect = (app: express.Application) => {
 
   io.on("connection", async (socket: Socket) => {
     console.log(chalk.green("Connect User", socket.id));
-
     socket.on("joinRoom", () => {
       const token = socket.handshake.auth.token;
-
+      console.log(chalk.green("Connect User", socket.id));
       try {
         if (token) {
           const currentUser = encrypt.verifyToken(token);
           if (currentUser) {
             socket.join(currentUser.id?.toString());
             onlineUser.add(currentUser.id?.toString());
+            socket.data.currentUser = currentUser;
+            io.emit("onlineUser", Array.from(onlineUser));
           }
         }
       } catch (error) {
@@ -43,8 +44,10 @@ const SocketConnect = (app: express.Application) => {
 
     //Disconnect
     socket.on("disconnect", () => {
+      const currentUser = socket.data.currentUser;
+      onlineUser.delete(currentUser?.id?.toString());
+      io.emit("onlineUser", Array.from(onlineUser));
       console.log(chalk.red("Disconnect user", socket.id));
-      onlineUser.delete(socket.id);
     });
   });
   return { server, io };
