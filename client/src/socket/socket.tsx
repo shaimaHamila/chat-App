@@ -36,7 +36,6 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
         newSocketConnection.emit("joinRoom");
         // Listen to 'onlineUser' and update the state dynamically
         newSocketConnection.on("onlineUser", (onlineUsers: string[]) => {
-          console.log("onlineUsers from socket", onlineUsers);
           store.dispatch(setOnlineUsers(onlineUsers));
         });
         newSocketConnection.on("conversationUpdate", (updatedConversation: Conversation) => {

@@ -68,10 +68,7 @@ const DashboardLayout = () => {
       <AddUserToChatModal
         isAddUserToChatModalOpen={isAddUserToChatModalOpen}
         onAddUserToChat={(userId: string | null) => {
-          console.log("userIdddddddddd", userId);
           if (userId !== null) {
-            //Create conversation and what if it is existing ????
-            //Remove current user form list
             store.dispatch(setCurrentConversationToNull());
             navigate(`/chat/${userId}`); // Navigate to /:userId
           }
